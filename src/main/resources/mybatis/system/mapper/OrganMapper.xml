@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sdd.mapper.OrganMapper">
+
+	<!--表名 -->
+	<sql id="tableName">
+		JT_ORGAN
+	</sql>
+	
+	<!-- 字段 -->
+	<sql id="Field">
+		ORGAN_ID,	
+		PARENT_ID,	
+		ORGAN_NAME	
+	</sql>
+	
+	<!-- 字段值 -->
+	<sql id="FieldValue">
+		#{ORGAN_ID,jdbcType=VARCHAR},	
+		#{PARENT_ID,jdbcType=VARCHAR},	
+		#{ORGAN_NAME,jdbcType=VARCHAR}
+	</sql>
+	
+	<select id="list" parameterType="java.util.Map" resultType="java.util.Map">
+		select a.ORGAN_ID,a.PARENT_ID,a.ORGAN_NAME,(select ORGAN_ID||ORGAN_NAME from 
+		<include refid="tableName"></include> 
+		t where t.organ_id = a.parent_id
+		) PARENT_NAME from 
+		<include refid="tableName"></include> a
+		where 1=1
+		<if test="keywords!= null and keywords != ''">
+			and
+				(
+					 ORGAN_ID LIKE CONCAT(CONCAT('%', #{keywords}),'%')
+					 or 
+					 PARENT_ID LIKE CONCAT(CONCAT('%', #{keywords}),'%') 
+					 or
+					 ORGAN_NAME LIKE CONCAT(CONCAT('%', #{keywords}),'%')
+				)
+		</if>
+	</select>
+	
+	<select id="isExists" parameterType="java.util.Map" resultType="java.lang.Integer">
+		select count(1) from 
+		<include refid="tableName"></include> 
+		where organ_id = #{ORGAN_ID}
+	</select>
+	
+	<select id="hasChilden" parameterType="java.util.Map" resultType="java.lang.Integer">
+		select count(1) from 
+		<include refid="tableName"></include> 
+		where parent_id = #{ORGAN_ID}
+	</select>
+	
+	<select id="listDic" parameterType="java.util.Map" resultType="java.util.Map">
+		select ORGAN_ID,ORGAN_NAME from 
+		<include refid="tableName"></include>
+		where 1=1 
+		start with organ_id = #{user.organId} connect by prior organ_id  =  parent_id
+	</select>
+	
+	<select id="listById" parameterType="java.util.Map" resultType="java.util.Map">
+		select * from 
+		<include refid="tableName"></include>
+		where ORGAN_ID = #{ORGAN_ID,jdbcType=VARCHAR}
+	</select>
+	
+	<insert id="save" parameterType="java.util.Map">
+		insert into 
+		<include refid="tableName"></include>
+		(
+		<include refid="Field"></include>
+		) values (
+		<include refid="FieldValue"></include>
+		)
+	</insert>
+	
+	<update id="update" parameterType="java.util.Map">
+		update 
+		<include refid="tableName"></include>
+		set 
+		ORGAN_ID = #{ORGAN_ID,jdbcType=VARCHAR},
+		PARENT_ID = #{PARENT_ID,jdbcType=VARCHAR},
+		ORGAN_NAME = #{ORGAN_NAME,jdbcType=VARCHAR}
+		where ORGAN_ID = #{ORGAN_ID,jdbcType=VARCHAR}
+	</update>
+	
+	<delete id="delete" parameterType="java.util.Map">
+		delete from 
+		<include refid="tableName"></include>
+		where ORGAN_ID = #{ORGAN_ID}
+	</delete>
+    
+</mapper>

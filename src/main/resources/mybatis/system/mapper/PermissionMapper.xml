@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sdd.mapper.PermissionMapper">
+
+	<!--表名 -->
+	<sql id="tableName">
+		JT_MENU
+	</sql>
+	
+	<!-- 字段 -->
+	<sql id="Field">
+		MENU_ID,	
+		MENU_NAME,	
+		MENU_URL,	
+		PARENT_ID,	
+		MENU_ORDER,	
+		MENU_ICON,	
+		MENU_TYPE
+	</sql>
+	
+	<!-- 字段值 -->
+	<sql id="FieldValue">
+		#{MENU_ID},	
+		#{MENU_NAME,jdbcType=VARCHAR},	
+		#{MENU_URL,jdbcType=VARCHAR},	
+		#{PARENT_ID},	
+		#{MENU_ORDER},	
+		#{MENU_ICON,jdbcType=VARCHAR},	
+		#{MENU_TYPE,jdbcType=VARCHAR}
+	</sql>
+	
+	<select id="getRoot" resultType="java.util.Map">
+	select MENU_ID B_ID,PARENT_ID B_PID,MENU_URL B_URL,MENU_NAME B_NAME from JT_MENU where
+		parent_id = 0 order by MENU_ORDER
+	</select>
+	
+	<select id="getNodes" parameterType="java.lang.String" resultType="java.util.Map">
+	select MENU_ID B_ID,PARENT_ID B_PID,MENU_URL B_URL,MENU_NAME B_NAME
+	from JT_MENU where
+		parent_id = #{parent_id} order by MENU_ORDER
+	</select>
+	
+	<select id="getFaPermission" resultType="java.util.Map">
+		select t.*
+		from jt_menu t where
+		t.parent_id = 0 order by MENU_ORDER
+	</select>
+	
+	<select id="getPermission" resultType="java.util.Map">
+		select *
+		from jt_menu where parent_id != 0 order by MENU_ORDER
+	</select>
+
+	<select id="getAllPermission" resultType="java.util.Map">
+		select *
+		from jt_menu
+	</select>
+	
+	<select id="getPermissionById" parameterType="java.util.Map" resultType="java.util.Map">
+		select a.*,
+		       (select name
+		          from jt_dictionaries
+		         where parent_id in
+		               (select dic_id
+		                  from jt_column_dic dic
+		                 where dic.table_name = 'JT_MENU'
+		                   and dic.table_column = 'MENU_TYPE')
+		           and bianma = a.MENU_TYPE) MENU_TYPE_DESC
+		  from jt_menu a where 1=1 
+		<if test="PARENT_ID != null and PARENT_ID != ''">
+		and parent_id = #{PARENT_ID}
+		</if>
+		order by menu_order
+	</select>
+	
+	<select id="findById" parameterType="java.lang.String" resultType="java.util.Map">
+		select * from jt_menu where MENU_ID = #{menuId}
+	</select>
+	
+	<insert id="save" parameterType="java.util.Map">
+		insert into 
+		<include refid="tableName"></include>
+		(
+		<include refid="Field"></include>
+		) values (
+		<include refid="FieldValue"></include>
+		)
+	</insert>
+	
+	<update id="update" parameterType="java.util.Map">
+		update 
+		<include refid="tableName"></include>
+		set
+		MENU_NAME = #{MENU_NAME,jdbcType=VARCHAR},	
+		MENU_URL = #{MENU_URL,jdbcType=VARCHAR},	
+		MENU_ORDER = #{MENU_ORDER},	
+		MENU_TYPE = #{MENU_TYPE,jdbcType=VARCHAR}
+		where menu_id = #{TREE_ID}
+	</update>
+	
+	<delete id="delete" parameterType="java.util.Map">
+		delete from 
+		<include refid="tableName"></include>
+		where menu_id in (
+		  select t.menu_id
+		    from jt_menu t
+		   start with t.menu_id = #{TREE_ID}
+		  connect by prior t.menu_id = t.parent_id)
+	</delete>
+	
+	<select id="findDel" parameterType="java.util.Map" resultType="java.util.Map">
+		select t.MENU_ID
+		    from jt_menu t
+		   start with t.menu_id = #{TREE_ID}
+		  connect by prior t.menu_id = t.parent_id
+	</select>
+	
+	<!--保存菜单图标  -->
+	<update id="editicon" parameterType="java.util.Map">
+		update 
+		<include refid="tableName"></include> 
+		set 
+			"MENU_ICON"=#{MENU_ICON}
+		where
+			"MENU_ID"=#{TREE_ID}
+	</update>
+    
+</mapper>

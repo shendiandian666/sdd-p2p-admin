@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zyx.mapper.invest.TeamActivityMapper">
+
+	<!--表名 -->
+	<sql id="tableName">
+		"p2p_team_activity"
+	</sql>
+	
+	<!-- 字段 -->
+	<sql id="Field">
+		id,
+		platform_id,
+		activity_ids,
+		title,
+		target_account,
+		add_rebate,
+		begin_date,
+		end_date,
+		status,
+		ID
+	</sql>
+	
+	<!-- 字段值 -->
+	<sql id="FieldValue">
+		#{id},
+		#{platform_id},
+		#{activity_ids},
+		#{title},
+		#{target_account},
+		#{add_rebate},
+		#{begin_date},
+		#{end_date},
+		#{status},
+		to_char(sysdate,'yyyyMMdd')||POINTS_DATA_SEQ.NEXTVAL		
+	</sql>
+	
+	<select id="list" parameterType="java.util.Map" resultType="java.util.Map">
+		select 
+				id,
+				platform_id,
+				activity_ids,
+				title,
+				target_account,
+				add_rebate,
+				begin_date,
+				end_date,
+				status,
+		ID
+		from 
+			<include refid="tableName"></include>
+			where 1=1 
+		
+		
+	</select>
+	
+	<select id="isExists" parameterType="java.util.Map" resultType="java.lang.Integer">
+		select count(1) from 
+		<include refid="tableName"></include> 
+		where ID = #{ID}
+	</select>
+	
+	<select id="listById" parameterType="java.util.Map" resultType="java.util.Map">
+		select 
+				id,
+				platform_id,
+				activity_ids,
+				title,
+				target_account,
+				add_rebate,
+				begin_date,
+				end_date,
+				status,
+		ID
+		from 
+		<include refid="tableName"></include>
+		where ID = #{ID}
+	</select>
+	
+	<insert id="save" parameterType="java.util.Map">
+		insert into 
+		<include refid="tableName"></include>
+		(
+		<include refid="Field"></include>
+		) values (
+		<include refid="FieldValue"></include>
+		)
+	</insert>
+	
+	<update id="update" parameterType="java.util.Map">
+		update 
+		<include refid="tableName"></include>
+		set 
+		id = #{id},
+		platform_id = #{platform_id},
+		activity_ids = #{activity_ids},
+		title = #{title},
+		target_account = #{target_account},
+		add_rebate = #{add_rebate},
+		begin_date = #{begin_date},
+		end_date = #{end_date},
+		status = #{status},
+		ID = ID
+		where ID = #{ID}
+	</update>
+	
+	<delete id="delete" parameterType="java.util.Map">
+		delete from 
+		<include refid="tableName"></include>
+		where ID = #{ID}
+	</delete>
+    
+</mapper>

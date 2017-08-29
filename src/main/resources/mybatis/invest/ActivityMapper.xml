@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sdd.mapper.invest.ActivityMapper">
+
+	<!--表名 -->
+	<sql id="tableName">
+		p2p_activity
+	</sql>
+	
+	<!-- 字段 -->
+	<sql id="Field">
+		platform_id,
+		title,
+		isFirst,
+		<if test="bestName != null and bestName != ''">
+			bestName,
+		</if>
+		<if test="bestDeposit != null and bestDeposit != ''">
+			bestDeposit,
+		</if>
+		<if test="bestMoney != null and bestMoney != ''">
+			bestMoney,
+		</if>
+		<if test="bestInterest != null and bestInterest != ''">
+			bestInterest,
+		</if>
+		joins,
+		status,
+		requiredImage,
+		requiredUsername,
+		url,
+		mobileUrl,
+		content,
+		orderby
+	</sql>
+	
+	<!-- 字段值 -->
+	<sql id="FieldValue">
+		#{platform_id},
+		#{title},
+		#{isFirst},
+		<if test="bestName != null and bestName != ''">
+			#{bestName},
+		</if>
+		<if test="bestDeposit != null and bestDeposit != ''">
+			#{bestDeposit},
+		</if>
+		<if test="bestMoney != null and bestMoney != ''">
+			#{bestMoney},
+		</if>
+		<if test="bestInterest != null and bestInterest != ''">
+			#{bestInterest},
+		</if>
+		#{joins},
+		#{status},
+		#{requiredImage},
+		#{requiredUsername},
+		#{url},
+		#{mobileUrl},
+		#{content},
+		#{orderby}
+	</sql>
+	
+	<select id="list" parameterType="java.util.Map" resultType="java.util.Map">
+		select 
+				(select name from p2p_platform where id = platform_id) platform_name,
+				title,
+				(select name
+	          from jt_dictionaries
+	         where parent_id in
+	               (select dic_id
+	                  from jt_column_dic dic
+	                 where dic.table_name = 'p2p_activity'
+	                   and dic.table_column = 'isFirst')
+	           and bianma = isFirst) isFirst_des,
+				isFirst,
+				bestName,
+				bestDeposit,
+				bestMoney,
+				bestInterest,
+				joins,
+				(select name
+	          from jt_dictionaries
+	         where parent_id in
+	               (select dic_id
+	                  from jt_column_dic dic
+	                 where dic.table_name = 'p2p_activity'
+	                   and dic.table_column = 'status')
+	           and bianma = status) status_des,
+	           (select style
+	          from jt_dictionaries
+	         where parent_id in
+	               (select dic_id
+	                  from jt_column_dic dic
+	                 where dic.table_name = 'p2p_activity'
+	                   and dic.table_column = 'status')
+	           and bianma = status) style,
+				status,
+				requiredImage,
+				requiredUsername,
+				url,
+				mobileUrl,
+				content,
+		ID
+		from 
+			<include refid="tableName"></include>
+			where 1=1 
+			<if test="q_platform_id != null and q_platform_id != ''">
+				and platform_id = #{q_platform_id}
+			</if>
+			order by platform_id
+		
+	</select>
+	
+	<select id="isExists" parameterType="java.util.Map" resultType="java.lang.Integer">
+		select count(1) from 
+		<include refid="tableName"></include> 
+		where ID = #{ID}
+	</select>
+	
+	<select id="listById" parameterType="java.util.Map" resultType="java.util.Map">
+		select 
+				platform_id,
+				title,
+				isFirst,
+				bestName,
+				bestDeposit,
+				bestMoney,
+				bestInterest,
+				joins,
+				status,
+				requiredImage,
+				requiredUsername,
+				url,
+				mobileUrl,
+				content,
+		ID
+		from 
+		<include refid="tableName"></include>
+		where ID = #{ID}
+	</select>
+	
+	<select id="listDic" resultType="java.util.Map">
+		select a.id,concat(b.name,'(',a.title,')') name 
+		from p2p_activity a,p2p_platform b
+		where a.platform_id = b.id
+	</select>
+	
+	<insert id="save" parameterType="java.util.Map">
+		insert into 
+		<include refid="tableName"></include>
+		(
+		<include refid="Field"></include>
+		) values (
+		<include refid="FieldValue"></include>
+		)
+	</insert>
+	
+	<update id="update" parameterType="java.util.Map">
+		update 
+		<include refid="tableName"></include>
+		set 
+		<if test="platform_id != null and platform_id != ''">
+			platform_id = #{platform_id},
+		</if>
+		<if test="title != null and title != ''">
+			title = #{title},
+		</if>
+		<if test="isFirst != null and isFirst != ''">
+			isFirst = #{isFirst},
+		</if>
+		<if test="bestName != null and bestName != ''">
+			bestName = #{bestName},
+		</if>
+		<if test="bestDeposit != null and bestDeposit != ''">
+			bestDeposit = #{bestDeposit},
+		</if>
+		<if test="bestMoney != null and bestMoney != ''">
+			bestMoney = #{bestMoney},
+		</if>
+		<if test="bestInterest != null and bestInterest != ''">
+			bestInterest = #{bestInterest},
+		</if>
+		<if test="joins != null and joins != ''">
+			joins = #{joins},
+		</if>
+		<if test="status != null and status != ''">
+			status = #{status},
+		</if>
+		<if test="requiredImage != null and requiredImage != ''">
+			requiredImage = #{requiredImage},
+		</if>
+		<if test="requiredUsername != null and requiredUsername != ''">
+			requiredUsername = #{requiredUsername},
+		</if>
+		<if test="url != null and url != ''">
+			url = #{url},
+		</if>
+		<if test="mobileUrl != null and mobileUrl != ''">
+			mobileUrl = #{mobileUrl},
+		</if>
+		<if test="content != null and content != ''">
+			content = #{content},
+		</if>
+		<if test="orderby != null and orderby != ''">
+			orderby = #{orderby},
+		</if>
+		ID = ID
+		where ID = #{ID}
+	</update>
+	
+	<delete id="delete" parameterType="java.util.Map">
+		delete from 
+		<include refid="tableName"></include>
+		where ID = #{ID}
+	</delete>
+	
+	<select id="bestPlan" parameterType="java.util.Map" resultType="java.util.Map">
+	select * from p2p_activity_plan
+	where activity_id = #{ID}
+	order by interest desc limit 1
+	</select>
+    
+</mapper>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sdd.mapper.invest.AccountMapper">
+
+	<!--表名 -->
+	<sql id="tableName">
+		p2p_account
+	</sql>
+	
+	<select id="list" parameterType="java.util.Map" resultType="java.util.Map">
+		select *
+		  from 
+		<include refid="tableName"></include>
+		where 1=1 
+	</select>
+	
+	<select id="listById" parameterType="java.util.Map" resultType="java.util.Map">
+		select *
+		  from 
+		<include refid="tableName"></include>
+		where id = #{ID}
+	</select>
+	
+	<select id="isPass" parameterType="java.util.Map" resultType="java.lang.Integer">
+	select count(1) from p2p_account
+	 where account = #{account}
+	   and rebate_late &gt;= #{cash_back}
+	</select>
+	
+	<update id="updatePass" parameterType="java.util.Map">
+		update p2p_account
+		   set balance = balance + #{cash_back},
+		       rebate_late = rebate_late - #{cash_back}
+		 where account = #{account}
+	</update>
+	
+	<update id="updateNoPass" parameterType="java.util.Map">
+		update p2p_account
+		   set rebate_late = rebate_late - #{cash_back}
+		 where account = #{account}
+	</update>
+	
+    
+</mapper>

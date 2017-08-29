@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sdd.mapper.DictionariesMapper">
+
+	<!--表名 -->
+	<sql id="tableName">
+		JT_DICTIONARIES
+	</sql>
+	
+	<!-- 字段 -->
+	<sql id="Field">
+		NAME,	
+		BIANMA,	
+		ORDER_BY,	
+		PARENT_ID,	
+		STYLE
+	</sql>
+	
+	<!-- 字段值 -->
+	<sql id="FieldValue">
+		#{NAME,jdbcType=VARCHAR},	
+		#{BIANMA,jdbcType=VARCHAR},	
+		#{ORDER_BY},	
+		#{PARENT_ID},	
+		#{STYLE,jdbcType=VARCHAR}
+	</sql>
+	
+	<select id="listDic" parameterType="java.util.Map" resultType="java.util.Map">
+		select *
+	          from jt_dictionaries
+	         where parent_id in
+	               (select dic_id
+	                  from jt_column_dic dic
+	                 where dic.table_name = #{TABLE_NAME}
+	                   and dic.table_column = #{TABLE_COLUMN}) order by order_by
+	</select>
+	
+	<select id="listDicById" parameterType="java.util.Map" resultType="java.util.Map">
+	select * from jt_dictionaries
+	where parent_id = #{parent_id}
+	</select>
+	
+	<select id="getFaDictionaries" resultType="java.util.Map">
+		select *
+		from jt_dictionaries where
+		parent_id = 0 order by order_by
+	</select>
+	
+	<select id="getRoot" resultType="java.util.Map">
+	select DICTIONARIES_ID B_ID,PARENT_ID B_PID,NAME B_NAME from jt_dictionaries where
+		parent_id = 0 order by order_by
+	</select>
+	
+	<select id="getNodes" parameterType="java.lang.String" resultType="java.util.Map">
+		select DICTIONARIES_ID B_ID,PARENT_ID B_PID,NAME B_NAME 
+		from jt_dictionaries where
+		parent_id = #{parent_id}
+		order by order_by
+	</select>
+
+	<select id="getDictionaries" resultType="java.util.Map">
+		select *
+		from jt_dictionaries where parent_id != 0 order by order_by
+	</select>
+
+	<select id="getAllDictionaries" resultType="java.util.Map">
+		select *
+		from jt_dictionaries order by order_by
+	</select>
+	
+	<select id="getDictionariesById" parameterType="java.util.Map" resultType="java.util.Map">
+		select *
+		from jt_dictionaries where 1=1 
+		<if test="TREE_ID != null and TREE_ID != ''">
+		and parent_id = #{TREE_ID}
+		</if>
+		order by order_by
+	</select>
+	
+	<select id="findById" parameterType="java.util.Map" resultType="java.util.Map">
+		select *
+		from jt_dictionaries where DICTIONARIES_ID = #{TREE_ID}
+	</select>
+	
+	<insert id="save" parameterType="java.util.Map">
+		insert into 
+		<include refid="tableName"></include>
+		(
+		<include refid="Field"></include>
+		) values (
+		<include refid="FieldValue"></include>
+		)
+	</insert>
+	
+	<update id="update" parameterType="java.util.Map">
+		update
+		<include refid="tableName"></include>
+		set
+		NAME=#{NAME,jdbcType=VARCHAR},
+		BIANMA=#{BIANMA,jdbcType=VARCHAR},
+		ORDER_BY=#{ORDER_BY}
+		where DICTIONARIES_ID = #{TREE_ID}
+	</update>
+	
+	<delete id="delete" parameterType="java.util.Map">
+		delete from 
+		<include refid="tableName"></include>
+		where dictionaries_id in (
+		  select t.dictionaries_id
+		    from jt_dictionaries t
+		   start with t.dictionaries_id = #{TREE_ID}
+		  connect by prior t.dictionaries_id = t.parent_id)
+	</delete>
+    
+</mapper>

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sdd.mapper.RoleMapper">
+
+	<!--表名 -->
+	<sql id="tableName">
+		JT_ROLE
+	</sql>
+	
+	<!-- 字段 -->
+	<sql id="Field">
+		ROLE_ID,	
+		ROLE_NAME,	
+		ROLE_RIGHTS,
+		ORGAN_ID
+	</sql>
+	
+	<!-- 字段值 -->
+	<sql id="FieldValue">
+		SEQ_ROLE_ID.NEXTVAL,	
+		#{ROLE_NAME,jdbcType=VARCHAR},	
+		#{ROLE_RIGHTS,jdbcType=VARCHAR},	
+		#{user.organId,jdbcType=VARCHAR}
+	</sql>
+	
+	<select id="listAll" resultType="java.util.Map">
+	select * from 
+		<include refid="tableName"></include>
+	</select>
+	
+	<select id="list" parameterType="java.util.Map" resultType="java.util.Map">
+		select * from 
+		<include refid="tableName"></include>
+	 <if test="keywords!= null and keywords != ''">
+			and
+				(
+					 ROLE_NAME LIKE CONCAT(CONCAT('%', #{keywords}),'%')
+				)
+	</if>
+	</select>
+	
+	<select id="listById" parameterType="java.util.Map" resultType="java.util.Map">
+		select * from 
+		<include refid="tableName"></include>
+		where ROLE_ID = #{ROLE_ID,jdbcType=INTEGER}
+	</select>
+	
+	<insert id="save" parameterType="java.util.Map">
+		insert into 
+		<include refid="tableName"></include>
+		(
+		<include refid="Field"></include>
+		) values (
+		<include refid="FieldValue"></include>
+		)
+	</insert>
+	
+	<update id="update" parameterType="java.util.Map">
+		update 
+		<include refid="tableName"></include>
+		set ROLE_NAME = #{ROLE_NAME,jdbcType=VARCHAR},
+		ROLE_RIGHTS = #{ROLE_RIGHTS,jdbcType=VARCHAR}
+		where ROLE_ID = #{ROLE_ID,jdbcType=INTEGER}
+	</update>
+	
+	<update id="updateRights" parameterType="java.util.Map">
+		update 
+		<include refid="tableName"></include>
+		set
+		ROLE_RIGHTS = #{ROLE_RIGHTS,jdbcType=VARCHAR}
+		where ROLE_ID = #{ROLE_ID,jdbcType=INTEGER}
+	</update>
+	
+	<delete id="delete" parameterType="java.util.Map">
+		delete from 
+		<include refid="tableName"></include>
+		where ROLE_ID = #{ROLE_ID,jdbcType=INTEGER}
+	</delete>
+    
+</mapper>

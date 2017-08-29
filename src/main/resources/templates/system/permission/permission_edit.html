@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+
+<head th:include="/system/index/top::tophead">
+
+</head>
+<body class="no-skin">
+	<!-- /section:basics/navbar.layout -->
+	<div class="main-container" id="main-container">
+		<!-- /section:basics/sidebar -->
+		<div class="main-content">
+			<div class="main-content-inner">
+				<div class="page-content">
+					<div class="page-header">
+							<h1>
+								<small>
+									<i class="ace-icon fa fa-angle-double-right"></i>
+									编辑
+								</small>
+							</h1>
+					</div><!-- /.page-header -->
+					<div class="row">
+						<div class="col-xs-8 col-xs-offset-2">
+
+							<form th:action="@{'/permission'+${action}}" name="Form"
+								id="Form" method="post">
+								<input type="hidden" name="TREE_ID" id="TREE_ID"
+									th:value="${TREE_ID}" />
+								<input type="hidden" name="PARENT_ID" id="PARENT_ID"
+														th:value="${PARENT_ID}" />
+								<div id="zhongxin">
+									<table id="table_report"
+										class="table table-striped table-bordered table-hover"
+										style="margin-top: 15px;">
+										<tr th:if="${parentName != null}">
+											<td
+												style="width: 70px; text-align: right; padding-top: 13px;">上级:</td>
+											<td>
+												<div
+													class="col-xs-4 label label-lg label-light arrowed-in arrowed-right">
+													<b th:inline="text">[[${parentName == null ? '根目录' :
+														parentName.MENU_NAME}]]</b>
+												</div>
+											</td>
+										</tr>
+										<tr>
+											<td
+												style="width: 120px; text-align: right; padding-top: 13px;">菜单/按钮名称:</td>
+											<td><input type="text" name="MENU_NAME" id="MENU_NAME"
+												th:value="${result == null ? '' : result.MENU_NAME}" maxlength="50" placeholder=""
+												title="" style="width: 98%;" /></td>
+										</tr>
+										<tr>
+											<td
+												style="width: 120px; text-align: right; padding-top: 13px;">菜单/按钮路径:</td>
+											<td><input type="text" name="MENU_URL" id="MENU_URL"
+												th:value="${result == null ? '' : result.MENU_URL}" maxlength="50" placeholder=""
+												title="" style="width: 98%;" /></td>
+										</tr>
+										<tr>
+											<td
+												style="width: 120px; text-align: right; padding-top: 13px;">排序:</td>
+											<td><input type="number" name="MENU_ORDER"
+												id="MENU_ORDER" th:value="${result == null ? '' : result.MENU_ORDER}" maxlength="32"
+												placeholder="" title="" style="width: 76%;" /></td>
+										</tr>
+										<tr>
+											<td
+												style="width: 120px; text-align: right; padding-top: 13px;">类型:</td>
+											<td>
+												<select name="MENU_TYPE" id="MENU_TYPE" >
+													<option th:each="item,status : ${menutypeList}" th:value="${item.BIANMA}" th:selected="${item.BIANMA == (result == null ? '' : result.MENU_TYPE)}" th:inline="text">[[${item.NAME}]]</option>
+												</select>	
+											</td>
+										</tr>
+									</table>
+								</div>
+
+								<div id="zhongxin2" class="center" style="display: none">
+									<br /> <br /> <br /> <br /> <br /> <img
+										th:src="@{/images/jiazai.gif}" /><br />
+									<h4 class="lighter block green">提交中...</h4>
+								</div>
+
+							</form>
+
+							<div id="zhongxin2" class="center" style="display: none">
+								<img th:src="@{/images/jzx.gif}" style="width: 50px;" /><br />
+								<h4 class="lighter block green"></h4>
+							</div>
+						</div>
+						<!-- /.col -->
+					</div>
+					<!-- /.row -->
+				</div>
+				<!-- /.page-content -->
+			</div>
+		</div>
+		<!-- /.main-content -->
+	</div>
+	<!-- /.main-container -->
+	<footer>
+		<div style="width: 100%; padding-bottom: 2px;" class="center">
+			<a class="btn btn-mini btn-primary" onclick="save();">保存</a> <a
+				class="btn btn-mini btn-danger" onclick="cancel();">取消</a>
+		</div>
+	</footer>
+
+	<!-- 页面底部js¨ -->
+	<div th:include="/system/index/foot::footdiv" />
+	<!--提示框-->
+	<script type="text/javascript" th:src="@{/js/jquery.tips.js}"></script>
+	<script type="text/javascript" th:inline="javascript">
+		$(top.hangge());
+		var action = [[${action}]];	
+		function cancel(){
+			/*<![CDATA[*/
+			top.jzts();
+			if(true && document.forms[0]){
+				var url = /*[[${url}]]*/;
+				url += "&PARENT_ID=" + /*[[${PARENT_ID}]]*/;
+				document.forms[0].action = url;
+				document.forms[0].submit();
+			}
+			/*]]>*/	
+		}
+		//保存
+		function save() {
+			if ($("#MENU_NAME").val() == "") {
+				$("#MENU_NAME").tips({
+					side : 3,
+					msg : '菜单/按钮名称',
+					bg : '#AE81FF',
+					time : 2
+				});
+				$("#MENU_NAME").focus();
+				return false;
+			}
+			if ($("#MENU_URL").val() == "") {
+				$("#MENU_URL").tips({
+					side : 3,
+					msg : '菜单/按钮路径',
+					bg : '#AE81FF',
+					time : 2
+				});
+				$("#MENU_URL").focus();
+				return false;
+			}
+			if ($("#MENU_ORDER").val() == "") {
+				$("#MENU_ORDER").tips({
+					side : 3,
+					msg : '请输入排序序号',
+					bg : '#AE81FF',
+					time : 2
+				});
+				$("#MENU_ORDER").focus();
+				return false;
+			}
+			
+			$.post(/*[[@{'/permission'+${action}}]]*/,$("#Form").serializeJSON(),function(data){
+				if(data == 'SUCCESS'){
+					window.parent.refreshTree();
+					cancel();
+				}else{
+					alert(data);
+				}
+			});
+		}
+	</script>
+</body>
+</html>

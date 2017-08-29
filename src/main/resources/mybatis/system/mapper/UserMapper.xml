@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sdd.mapper.UserMapper">
+
+	<resultMap type="com.sdd.model.system.User" id="userMap">
+		<id property="userId" column="USER_ID"/>
+		<result property="organId" column="ORGAN_ID"/>
+		<result property="organName" column="ORGAN_NAME"/>
+		<result property="userName" column="USER_NAME"/>
+		<result property="password" column="PASSWORD"/>
+		<result property="realName" column="REAL_NAME"/>
+		<result property="rights" column="RIGHTS"/>
+		<result property="lastLogin" column="LAST_LOGIN"/>
+		<result property="loginIp" column="LOGIN_IP"/>
+		<result property="status" column="STATUS"/>
+		<result property="roleRights" column="ROLE_RIGHTS"/>
+	</resultMap>
+	
+	<select id="findByName"  parameterType="string" resultMap="userMap">
+	  SELECT a.USER_ID,
+         	a.ORGAN_ID,
+         	b.ORGAN_NAME,
+           a.USER_NAME,
+           a.PASSWORD,
+           a.REAL_NAME,
+           a.RIGHTS,
+           a.LAST_LOGIN,
+           a.LOGIN_IP,
+           a.STATUS,
+           a.ROLE_RIGHTS
+      FROM jt_user a,jt_organ b
+     WHERE a.organ_id=b.organ_id
+	   and a.USER_NAME = #{name}	
+   </select>
+   
+   <!--表名 -->
+	<sql id="tableName">
+		JT_USER
+	</sql>
+	
+	<!-- 字段 -->
+	<sql id="Field">
+		USER_ID,	
+		ORGAN_ID,
+		USER_NAME,	
+		PASSWORD,
+		REAL_NAME,
+		RIGHTS,
+		ROLE_RIGHTS,
+		STATUS
+	</sql>
+	
+	<!-- 字段值 -->
+	<sql id="FieldValue">
+		TO_CHAR(sysdate, 'yyyyMMddHH24miss')||SEQ_USER_ID.NEXTVAL,	
+		#{ORGAN_ID,jdbcType=VARCHAR},
+		#{USER_NAME,jdbcType=VARCHAR},	
+		#{PASSWORD,jdbcType=VARCHAR},
+		#{REAL_NAME,jdbcType=VARCHAR},
+		#{RIGHTS,jdbcType=VARCHAR},
+		#{ROLE_RIGHTS,jdbcType=VARCHAR},
+		#{STATUS,jdbcType=VARCHAR}
+	</sql>
+	
+	<select id="list" parameterType="java.util.Map" resultType="java.util.Map">
+		select a.*,
+	       (select name
+	          from jt_dictionaries
+	         where parent_id in
+	               (select dic_id
+	                  from jt_column_dic dic
+	                 where dic.table_name = 'JT_USER'
+	                   and dic.table_column = 'STATUS')
+	           and bianma = a.status) STATUS_DESC,
+	       b.organ_id || b.organ_name ORGAN_NAME
+	  from jt_user a
+	 <if test="keywords!= null and keywords != ''">
+			and
+				(
+					 USER_NAME LIKE CONCAT(CONCAT('%', #{keywords}),'%')
+					 or 
+					 REAL_NAME LIKE CONCAT(CONCAT('%', #{keywords}),'%') 
+				)
+		</if>
+		order by a.user_id
+	</select>
+	
+	<select id="listById" parameterType="java.util.Map" resultType="java.util.Map">
+		select * from 
+		<include refid="tableName"></include>
+		where USER_ID = #{USER_ID,jdbcType=VARCHAR}
+	</select>
+	
+	<select id="loginUser" parameterType="java.util.Map" resultType="java.util.Map">
+		select * from 
+		<include refid="tableName"></include> 
+		where USER_ID = #{user.userId,jdbcType=VARCHAR}
+	</select>
+	
+	<insert id="save" parameterType="java.util.Map">
+		insert into 
+		<include refid="tableName"></include>
+		(
+		<include refid="Field"></include>
+		) values (
+		<include refid="FieldValue"></include>
+		)
+	</insert>
+		
+	<update id="update" parameterType="java.util.Map">
+		update 
+		<include refid="tableName"></include>
+		set 
+		ORGAN_ID = #{ORGAN_ID,jdbcType=VARCHAR},
+		USER_NAME = #{USER_NAME,jdbcType=VARCHAR},
+		REAL_NAME = #{REAL_NAME,jdbcType=VARCHAR},
+		RIGHTS = #{RIGHTS,jdbcType=VARCHAR},
+		ROLE_RIGHTS = #{ROLE_RIGHTS,jdbcType=VARCHAR},
+		STATUS = #{STATUS,jdbcType=VARCHAR}
+		where USER_ID = #{USER_ID,jdbcType=VARCHAR}
+	</update>
+	
+	<update id="updatePasswd" parameterType="java.util.Map">
+		update 
+		<include refid="tableName"></include>
+		set
+		password = #{USER_PASSWD}
+		where user_id = #{USER_ID}
+	</update>
+	
+	<update id="updateUserInfo" parameterType="java.util.Map">
+		update 
+		<include refid="tableName"></include>
+		set 
+		REAL_NAME = #{REAL_NAME,jdbcType=VARCHAR},
+		EMAIL = #{EMAIL,jdbcType=VARCHAR},
+		PHONE = #{PHONE,jdbcType=VARCHAR}
+		where USER_ID = #{user.userId,jdbcType=VARCHAR}
+	</update>
+	
+	<update id="updateRights" parameterType="java.util.Map">
+		update 
+		<include refid="tableName"></include>
+		set
+		RIGHTS = #{RIGHTS,jdbcType=VARCHAR}
+		where USER_ID = #{USER_ID,jdbcType=INTEGER}
+	</update>
+	
+	<update id="updateRoleRights" parameterType="java.util.Map">
+		update 
+		<include refid="tableName"></include>
+		set
+		ROLE_RIGHTS = #{ROLE_RIGHTS,jdbcType=VARCHAR}
+		where USER_ID = #{USER_ID,jdbcType=INTEGER}
+	</update>
+	
+	<delete id="delete" parameterType="java.util.Map">
+		delete from 
+		<include refid="tableName"></include>
+		where USER_ID = #{USER_ID,jdbcType=VARCHAR}
+	</delete>
+    
+</mapper>

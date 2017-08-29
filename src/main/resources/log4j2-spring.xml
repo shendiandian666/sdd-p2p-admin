@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<configuration>
+	<properties>
+		<!-- 文件输出格式 -->
+		<property name="PATTERN">%d [%t] %-5p [%c] - %m%n  </property>
+	</properties>
+
+	<appenders>
+		<Console name="CONSOLE" target="SYSTEM_OUT">
+			<PatternLayout pattern="${PATTERN}" />
+		</Console>
+		
+		<RollingFile name="RollingFile" fileName="/home/mbp/alipay/logs/jt.log"
+			filePattern="/home/mbp/alipay/logs/$${date:yyyy-MM}/jt-%d{MM-dd-yyyy}-%i.log">
+			<PatternLayout pattern="[%-5p] %d %c - %m%n" />
+			<Policies>
+				<TimeBasedTriggeringPolicy />
+				<SizeBasedTriggeringPolicy size="100 MB" />
+			</Policies>
+			<DefaultRolloverStrategy max="100" />
+		</RollingFile>
+		 
+	</appenders>
+
+	<loggers>
+		<logger name="com.sdd" level="debug" additivity="true">
+			<appenderref ref="RollingFile" />
+		</logger>
+		<root level="info">
+			<appenderref ref="CONSOLE" />
+		</root>
+	</loggers>
+
+</configuration>
+
+

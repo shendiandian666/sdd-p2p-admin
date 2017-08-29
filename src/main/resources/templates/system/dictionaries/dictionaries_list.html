@@ -1,0 +1,188 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3"
+	xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+
+<head th:include="/system/index/top::tophead">
+</head>
+<body class="no-skin">
+
+	<!-- /section:basics/navbar.layout -->
+	<div class="main-container" id="main-container">
+		<!-- /section:basics/sidebar -->
+		<div class="main-content">
+			<div class="main-content-inner">
+				<div class="page-content">
+					<div class="row">
+						<div class="col-xs-12">
+							<form th:action="@{/dictionariesRight}" method="post" name="Form"
+								id="Form">
+								<!-- 检索  -->
+								<!-- 检索  -->
+								<input type="hidden" name="TREE_ID" id="TREE_ID"
+									th:value="${TREE_ID}" />
+								<table id="simple-table"
+									class="table table-striped table-bordered table-hover"
+									style="margin-top: 5px;">
+									<thead>
+										<tr>
+											<th class="center">名称</th>
+											<th class="center">编码</th>
+											<th class="center">排序</th>
+											<th class="center">操作</th>
+										</tr>
+									</thead>
+
+									<tbody>
+
+										<tr th:each="right,status : ${rightList}" th:inline="text">
+											<td class='center'><a
+												th:href="@{/dictionariesRight(TREE_ID=${right.DICTIONARIES_ID})}">[[${right.NAME}]]</a></td>
+											<td class='center'>[[${right.BIANMA}]]</td>
+											<td class='center'>[[${right.ORDER_BY}]]</td>
+											<td class="center">
+												<!-- 
+												<span class="label label-large label-grey arrowed-in-right arrowed-in"><i class="ace-icon fa fa-lock" title="无权限"></i></span>
+												 -->
+													<div class="inline pos-rel">
+														<button class="btn btn-minier btn-yellow dropdown-toggle" data-toggle="dropdown" data-position="auto">
+														<i class="ace-icon fa fa-caret-down icon-only bigger-120"></i>
+														</button>
+														<ul
+															class="dropdown-menu dropdown-only-icon dropdown-yellow dropdown-menu-right dropdown-caret dropdown-close">
+															<li shiro:hasPermission="dictionaries:edit"><a
+																style="cursor: pointer;"
+																th:onclick="'edit(\''+@{/dictionariesEdit(TREE_ID=${right.DICTIONARIES_ID})}+'\');'"
+																class="tooltip-success" data-rel="tooltip" title="修改">
+																	<span class="green"> <i
+																		class="ace-icon fa fa-pencil-square-o bigger-120"></i>
+																</span>
+															</a></li>
+															<li shiro:hasPermission="dictionaries:delete"><a
+																style="cursor: pointer;"
+																th:onclick="'del(\''+@{/dictionariesDel(TREE_ID=${right.DICTIONARIES_ID})}+'\');'"
+																class="tooltip-error" data-rel="tooltip" title="删除">
+																	<span class="red"> <i
+																		class="ace-icon fa fa-trash-o bigger-120"></i>
+																</span>
+															</a></li>
+														</ul>
+													</div>
+											</td>
+										</tr>
+									</tbody>
+								</table>
+								<div class="page-header position-relative">
+									<table style="width: 100%;">
+										<tr>
+											<td style="vertical-align: top;"><a
+												shiro:hasPermission="dictionaries:add"
+												class="btn btn-mini btn-success"
+												th:onclick="'javascript:add(\''+${DICTIONARIES_ID}+'\');'">新增</a>
+											</td>
+											<td style="vertical-align: top;"><div class="pagination"
+													style="float: right; padding-top: 0px; margin-top: 0px;"
+													th:include="/system/page::pagination"></div></td>
+										</tr>
+									</table>
+								</div>
+							</form>
+
+						</div>
+						<!-- /.col -->
+					</div>
+					<!-- /.row -->
+				</div>
+				<!-- /.page-content -->
+			</div>
+		</div>
+		<!-- /.main-content -->
+
+
+		<!-- 返回顶部 -->
+		<a href="#" id="btn-scroll-up"
+			class="btn-scroll-up btn btn-sm btn-inverse"> <i
+			class="ace-icon fa fa-angle-double-up icon-only bigger-110"></i>
+		</a>
+
+	</div>
+	<!-- /.main-container -->
+
+	<!-- 页面底部js¨ -->
+	<div th:include="/system/index/foot::footdiv" />
+
+	<!-- 删除时确认窗口 -->
+	<script th:src="@{/ace/js/bootbox.js}"></script>
+	<!-- ace scripts -->
+	<script th:src="@{/ace/js/ace/ace.js}"></script>
+	<!--提示框-->
+	<script type="text/javascript" th:src="@{/js/jquery.tips.js}"></script>
+	<script type="text/javascript" th:inline="javascript">
+		$(top.hangge());//关闭加载状态
+		//检索
+		function gsearch() {
+			top.jzts();
+			$("#Form").submit();
+		}
+
+		//新增
+		function add() {
+			top.jzts();
+			var diag = new top.Dialog();
+			diag.Drag = true;
+			diag.Title = "新增";
+			diag.URL = /*[[@{/dictionariesAdd(TREE_ID=${TREE_ID})}]]*/;
+			diag.Width = 500;
+			diag.Height = 250;
+			diag.CancelEvent = function() { //关闭事件
+				if ('none' == diag.innerFrame.contentWindow.document
+						.getElementById('zhongxin').style.display) {
+					window.parent.refreshTree();
+					nextPage(/*[[${page.pageNum}]]*/);
+				}
+				diag.close();
+			};
+			diag.show();
+		}
+		
+		function edit(url) {
+			top.jzts();
+			var diag = new top.Dialog();
+			diag.Drag = true;
+			diag.Title = "编辑";
+			diag.URL = url;
+			diag.Width = 500;
+			diag.Height = 250;
+			diag.CancelEvent = function() { //关闭事件
+				if ('none' == diag.innerFrame.contentWindow.document
+						.getElementById('zhongxin').style.display) {
+					window.parent.refreshTree();
+					nextPage(/*[[${page.pageNum}]]*/);
+				}
+				diag.close();
+			};
+			diag.show();
+		}
+		
+		function del(url){
+			bootbox.confirm("确定要删除吗?", function(result) {
+				if(result) {
+					$.get(url,function(data){
+						if(data){
+							window.parent.refreshTree();
+							nextPage(/*[[${page.pageNum}]]*/);
+						}						
+							
+					});
+				}
+			});
+		}
+		
+		
+
+	</script>
+
+
+</body>
+</html>

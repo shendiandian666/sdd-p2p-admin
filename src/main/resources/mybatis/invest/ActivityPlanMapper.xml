@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sdd.mapper.invest.ActivityPlanMapper">
+
+	<!--表名 -->
+	<sql id="tableName">
+		p2p_activity_plan
+	</sql>
+	
+	<!-- 字段 -->
+	<sql id="Field">
+		activity_id,
+		name,
+		item,
+		depositDisplay_s,
+		depositDisplay_e,
+		depositDisplay_txt,
+		rebate,
+		rebateCycle,
+		rebatePlus,
+		days,
+		rate,
+		redback,
+		bbin,
+		bbin_interest,
+		others,
+		totalIncome,
+		totalIncome_txt,
+		year_rate,
+		orderby
+	</sql>
+	
+	<!-- 字段值 -->
+	<sql id="FieldValue">
+		#{activity_id},
+		#{name},
+		#{item},
+		#{depositDisplay_s},
+		#{depositDisplay_e},
+		#{depositDisplay_txt},
+		#{rebate},
+		#{rebateCycle},
+		#{rebatePlus},
+		#{days},
+		#{rate},
+		#{redback},
+		#{bbin},
+		#{bbin_interest},
+		#{others},
+		#{totalIncome},
+		#{totalIncome_txt},
+		#{year_rate},
+		#{orderby}	
+	</sql>
+	
+	<select id="list" parameterType="java.util.Map" resultType="java.util.Map">
+		select 
+			a.activity_id,
+			concat(c.name,'(',b.title,')') platform_name,
+			a.name,
+			a.depositDisplay_s,
+			a.depositDisplay_e,
+			a.depositDisplay_txt,
+			a.rebate,
+			a.rebateCycle,
+			a.rebatePlus,
+			a.days,
+			a.rate,
+			a.redback,
+			a.bbin,
+			a.bbin_interest,
+			a.others,
+			a.totalIncome,
+			a.totalIncome_txt,
+			a.year_rate,
+			a.orderby,
+			a.ID
+		from 
+			<include refid="tableName"></include> a,p2p_activity b,p2p_platform c
+			where 1=1 
+			and b.platform_id = c.id
+			and b.id = a.activity_id
+			<if test="q_platform_id != null and q_platform_id != ''">
+				and b.platform_id = #{q_platform_id}
+			</if>
+	</select>
+	
+	<select id="isExists" parameterType="java.util.Map" resultType="java.lang.Integer">
+		select count(1) from 
+		<include refid="tableName"></include> 
+		where ID = #{ID}
+	</select>
+	
+	<select id="listById" parameterType="java.util.Map" resultType="java.util.Map">
+		select 
+				activity_id,
+				name,
+				item,
+				depositDisplay_s,
+				depositDisplay_e,
+				depositDisplay_txt,
+				rebate,
+				rebateCycle,
+				rebatePlus,
+				days,
+				rate,
+				redback,
+				bbin,
+				bbin_interest,
+				others,
+				totalIncome,
+				totalIncome_txt,
+				year_rate,
+				orderby,
+		ID
+		from 
+		<include refid="tableName"></include>
+		where ID = #{ID}
+	</select>
+	
+	<select id="hightPlan" parameterType="java.util.Map" resultType="java.lang.Integer">
+		select count(1) from p2p_activity_plan
+		where activity_id=#{activity_id,jdbcType=INTEGER} 
+		and interest > #{interest,jdbcType=DOUBLE}
+	</select>
+	
+	<insert id="save" parameterType="java.util.Map">
+		insert into 
+		<include refid="tableName"></include>
+		(
+		<include refid="Field"></include>
+		) values (
+		<include refid="FieldValue"></include>
+		)
+	</insert>
+	
+	<update id="update" parameterType="java.util.Map">
+		update 
+		<include refid="tableName"></include>
+		set 
+		activity_id = #{activity_id},
+		name = #{name},
+		item = #{item},
+		depositDisplay_s = #{depositDisplay_s},
+		depositDisplay_e = #{depositDisplay_e},
+		depositDisplay_txt = #{depositDisplay_txt},
+		rebate = #{rebate},
+		rebateCycle = #{rebateCycle},
+		rebatePlus = #{rebatePlus},
+		days = #{days},
+		rate = #{rate},
+		redback = #{redback},
+		bbin = #{bbin},
+		bbin_interest = #{bbin_interest},
+		others = #{others},
+		totalIncome = #{totalIncome},
+		totalIncome_txt = #{totalIncome_txt},
+		year_rate = #{year_rate},
+		orderby = #{orderby}
+		where ID = #{ID}
+	</update>
+	
+	<delete id="delete" parameterType="java.util.Map">
+		delete from 
+		<include refid="tableName"></include>
+		where ID = #{ID}
+	</delete>
+    
+</mapper>

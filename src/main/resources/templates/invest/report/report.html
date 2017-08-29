@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+
+<head>
+<dif th:include="/system/index/top::tophead"></dif>
+</head>
+<body th:inline="text">
+
+	<!-- /section:basics/navbar.layout -->
+	<div class="main-container" id="main-container">
+		<!-- /section:basics/sidebar -->
+		<div class="main-content">
+			<div class="main-content-inner">
+				<div class="page-content">
+					<div class="row">
+						<div class="col-sm-12">
+							<div class="widget-box">
+								<div
+									class="widget-header widget-header-flat widget-header-small">
+									<h5 class="widget-title">
+										<i class="ace-icon fa fa-signal"></i> 投资金额/返利/收益
+									</h5>
+
+									<div class="widget-toolbar no-border">
+										<div class="inline dropdown-hover">
+											<button class="btn btn-minier btn-primary">
+												This Week <i
+													class="ace-icon fa fa-angle-down icon-on-right bigger-110"></i>
+											</button>
+
+											<ul
+												class="dropdown-menu dropdown-menu-right dropdown-125 dropdown-lighter dropdown-close dropdown-caret">
+												<li class="active"><a href="#" class="blue"> <i
+														class="ace-icon fa fa-caret-right bigger-110">&nbsp;</i>
+														This Week
+												</a></li>
+
+												<li><a href="#"> <i
+														class="ace-icon fa fa-caret-right bigger-110 invisible">&nbsp;</i>
+														Last Week
+												</a></li>
+
+												<li><a href="#"> <i
+														class="ace-icon fa fa-caret-right bigger-110 invisible">&nbsp;</i>
+														This Month
+												</a></li>
+
+												<li><a href="#"> <i
+														class="ace-icon fa fa-caret-right bigger-110 invisible">&nbsp;</i>
+														Last Month
+												</a></li>
+											</ul>
+										</div>
+									</div>
+								</div>
+
+								<div class="widget-body">
+									<div class="widget-main">
+										<!-- #section:plugins/charts.flotchart -->
+										<div id="piechart-placeholder"></div>
+										<!-- /section:plugins/charts.flotchart -->
+										<div class="hr hr8 hr-double"></div>
+
+										<div class="clearfix">
+											<!-- #section:custom/extra.grid -->
+											<div class="grid3">
+												<span class="grey"> <i
+													class="ace-icon fa fa-facebook-square fa-2x blue"></i>
+													&nbsp; 投资金额
+												</span><br/>
+												<h4 class="bigger">[[${reportData.totalDeposit}]]</h4>
+											</div>
+
+											<div class="grid3">
+												<span class="grey"> <i
+													class="ace-icon fa fa-twitter-square fa-2x purple"></i>
+													&nbsp; 返利
+												</span><br/>
+												<h4 class="bigger">[[${reportData.totalCashBack}]]</h4>
+											</div>
+<!--
+											<div class="grid3">
+												<span class="grey"> <i
+													class="ace-icon fa fa-pinterest-square fa-2x red"></i>
+													&nbsp; 收益
+												</span><br/>
+												<h4 class="bigger">0</h4>
+											</div>
+
+											 /section:custom/extra.grid -->
+										</div>
+									</div>
+									<!-- /.widget-main -->
+								</div>
+								<!-- /.widget-body -->
+							</div>
+							<!-- /.widget-box -->
+						</div>
+						<!-- /.col -->
+					</div>
+					<!-- /.row -->
+				</div>
+				<!-- /.page-content -->
+			</div>
+		</div>
+		<!-- /.main-content -->
+
+		<!-- 返回顶部 -->
+		<a href="#" id="btn-scroll-up"
+			class="btn-scroll-up btn btn-sm btn-inverse"> <i
+			class="ace-icon fa fa-angle-double-up icon-only bigger-110"></i>
+		</a>
+
+	</div>
+	<!-- /.main-container -->
+
+	<!-- basic scripts -->
+	<!-- 页面底部js¨ -->
+	<div th:include="/system/index/foot::footdiv" />
+	<!-- 删除时确认窗口 -->
+	<script th:src="@{/ace/js/bootbox.js}"></script>
+	<!-- ace scripts -->
+	<script th:src="@{/ace/js/ace/ace.js}"></script>
+	<!--[if lte IE 8]>
+	  <script th:src="@{/assets/js/excanvas.js}"></script>
+	<![endif]-->
+	<script th:src="@{/assets/js/flot/jquery.flot.js}"></script>
+	<script th:src="@{/assets/js/flot/jquery.flot.pie.js}"></script>
+	<script th:src="@{/assets/js/flot/jquery.flot.resize.js}"></script>
+
+	<script type="text/javascript" th:inline="text">
+		$(top.hangge());//关闭加载状态	
+		$(function(){
+			var placeholder = $('#piechart-placeholder').css({
+				'width' : '90%',
+				'min-height' : '450px'
+			});
+			var data = [{label : "投资金额",data : [[${reportData.totalDeposit/(reportData.totalDeposit+reportData.totalCashBack)}]],color : "#2091CF"}, 
+						{label : "返利",data : [[${reportData.totalCashBack/(reportData.totalDeposit+reportData.totalCashBack)}]],color : "#68BC31"}]
+			function drawPieChart(placeholder, data, position) {
+				$.plot(placeholder, data, {
+					series : {
+						pie : {
+							show : true,
+							tilt : 2,
+							highlight : {
+								opacity : 0.25
+							},
+							stroke : {
+								color : '#fff',
+								width : 2
+							},
+							startAngle : 2
+						}
+					},
+					legend : {
+						show : true,
+						position : position || "ne",
+						labelBoxBorderColor : null,
+						margin : [ -30, 15 ]
+					},
+					grid : {
+						hoverable : true,
+						clickable : true
+					}
+				})
+			}
+			drawPieChart(placeholder, data);
+
+			/**
+			we saved the drawing function and the data to redraw with different position later when switching to RTL mode dynamically
+			so that's not needed actually.
+			 */
+			placeholder.data('chart', data);
+			placeholder.data('draw', drawPieChart);
+
+			//pie chart tooltip example
+			var $tooltip = $('<div class="tooltip top in"><div class="tooltip-inner"></div></div>').hide().appendTo('body');
+			var previousPoint = null;
+			
+			placeholder.on('plothover', function(event, pos, item) {
+				if (item) {
+					if (previousPoint != item.seriesIndex) {
+						previousPoint = item.seriesIndex;
+						var tip = item.series['label'] + " : "
+								+ item.series['percent'] + '%';
+						$tooltip.show().children(0).text(tip);
+					}
+					$tooltip.css({
+						top : pos.pageY + 10,
+						left : pos.pageX + 10
+					});
+				} else {
+					$tooltip.hide();
+					previousPoint = null;
+				}
+
+			});
+		});
+	</script>
+
+
+</body>
+</html>

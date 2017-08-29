@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+
+<head>
+
+<dif th:include="/system/index/top::tophead"></dif>
+<script th:src="@{/js/plupload/plupload.full.min.js}"></script>
+<!-- 日期框 -->
+<link rel="stylesheet" th:href="@{/ace/css/datepicker.css}" />
+</head>
+<body class="no-skin">
+	<!-- /section:basics/navbar.layout -->
+	<div class="main-container" id="main-container">
+		<!-- /section:basics/sidebar -->
+		<div class="main-content">
+			<div class="main-content-inner">
+				<div class="page-content">
+					<div class="page-header">
+							<h1>
+								<small>
+									<i class="ace-icon fa fa-angle-double-right"></i>
+									编辑
+								</small>
+							</h1>
+					</div><!-- /.page-header -->
+					<div class="row">
+						<div class="col-xs-8 col-xs-offset-2">
+
+							<form th:action="@{'/invest/platform'+${action}}" name="Form" id="Form"
+								method="post">
+								<input type="hidden" name="ID" id="ID" th:value="${platform == null ? '' : platform.ID}" />
+								<div id="zhongxin" style="padding-top: 13px;">
+									<table id="table_report"
+										class="table table-striped table-bordered table-hover">
+										<tr>
+											<td style="text-align: right; padding-top: 13px;width: 40%;">平台简称:</td>
+											<td><input type="text" name="name" id="name"
+												th:value="${platform == null ? '' : platform.name}" style="width: 98%;" /></td>
+										</tr>
+										<tr>
+											<td style="text-align: right; padding-top: 13px;">公司名称:</td>
+											<td><input type="text" name="plat_name" id="plat_name"
+												th:value="${platform == null ? '' : platform.plat_name}" style="width: 98%;" /></td>
+										</tr>
+										<tr>
+											<td style="text-align: right; padding-top: 13px;">公司网址:</td>
+											<td><input type="text" name="url" id="url"
+												th:value="${platform == null ? '' : platform.url}" style="width: 98%;" /></td>
+										</tr>
+										<tr>
+											<td style="text-align: right; padding-top: 13px;">平台介绍:</td>
+											<td>
+											<textarea rows="6" cols="" name="platform_intro" id="platform_intro" 
+											style="width: 98%;" th:inline="text">[[${platform == null ? '' : platform.platform_intro}]]</textarea>
+											</td>
+										</tr>
+										<tr>
+											<td style="text-align: right; padding-top: 13px;">平台图标:</td>
+											<td>
+												<input type="hidden" name="platform_img" id="platform_img" th:value="${platform == null ? '' : platform.platform_img}"/>
+										        <button id="uploader">选择文件</button>
+										        <div id="imgList"><img width="120px" height="50px" th:src="${platform == null ? '' : platform.platform_img}" /></div>
+											</td>
+										</tr>
+										<tr>
+											<td style="text-align: right; padding-top: 13px;">平台分级:</td>
+											<td>
+												<select name="risk" id="risk" onchange="riskChange(this)">
+													<option value="A" th:selected="${platform == null ? false : platform.risk == 'A'}">A-保守</option>
+													<option value="B" th:selected="${platform == null ? false : platform.risk == 'B'}">B-稳建</option>
+													<option value="C" th:selected="${platform == null ? false : platform.risk == 'C'}">C-进取</option>
+													<option value="D" th:selected="${platform == null ? false : platform.risk == 'D'}">D-激进</option>
+													<option value="E" th:selected="${platform == null ? false : platform.risk == 'E'}">E-高返</option>
+												</select>
+											</td>
+										</tr>
+										<tr style="display:none">
+											<td style="text-align: right; padding-top: 13px;">分级名称:</td>
+											<td><input type="text" name="riskDisplay" id="riskDisplay"
+												th:value="${platform == null ? '' : platform.riskDisplay}" style="width: 98%;" /></td>
+										</tr>
+										<tr>
+											<td style="text-align: right; padding-top: 13px;">融资背景(A,B,C轮):</td>
+											<td><input type="text" name="finance_bg" id="finance_bg"
+												th:value="${platform == null ? '' : platform.finance_bg}" style="width: 98%;" /></td>
+										</tr>
+										<tr>
+											<td style="text-align: right; padding-top: 13px;">平台背景(民营/上市公司):</td>
+											<td><input type="text" name="platform_bg" id="platform_bg"
+												th:value="${platform == null ? '' : platform.platform_bg}" style="width: 98%;" /></td>
+										</tr>
+										<tr>
+											<td style="text-align: right; padding-top: 13px;">银行存管(上海银行):</td>
+											<td><input type="text" name="bank_manage" id="bank_manage"
+												th:value="${platform == null ? '' : platform.bank_manage}" style="width: 98%;" /></td>
+										</tr>
+										<tr>
+											<td style="text-align: right; padding-top: 13px;">ICP证(京ICP证12345号):</td>
+											<td><input type="text" name="icp_card" id="icp_card"
+												th:value="${platform == null ? '' : platform.icp_card}" style="width: 98%;" /></td>
+										</tr>
+										<tr>
+											<td style="text-align: right; padding-top: 13px;">平台优势(A轮融资,A股上市):</td>
+											<td><input type="text" name="platform_tags" id="platform_tags"
+												th:value="${platform == null ? '' : platform.platform_tags}" style="width: 98%;" /></td>
+										</tr>
+										<tr>
+											<td style="text-align: right; padding-top: 13px;">提现速度(T+0/T+1):</td>
+											<td>
+											<input type="text" name="cash_speed" id="cash_speed"
+												th:value="${platform == null ? '' : platform.cash_speed}" style="width: 98%;" />
+											</td>
+										</tr>
+										<tr>
+											<td style="text-align: right; padding-top: 13px;">注册资本:</td>
+											<td><input type="text" name="principal" id="principal"
+												th:value="${platform == null ? '' : platform.principal}" style="width: 98%;" /></td>
+										</tr>
+										<tr>
+											<td style="text-align: right; padding-top: 13px;">上线时间:</td>
+											<td>
+											<input class="span10 date-picker" type="text" name="online" id="online" data-date-format="yyyy-mm-dd"
+												th:value="${platform == null ? '' : platform.online}" style="width: 98%;" />
+											</td>
+										</tr>
+										<tr>
+											<td style="text-align: right; padding-top: 13px;">平台状态:</td>
+											<td>
+											<select name="status" id="status">
+												<option th:each="item,status : ${statusList}"
+													th:value="${item.BIANMA}"
+													th:selected="${item.BIANMA == (platform == null ? '' : platform.status)}"
+													th:inline="text">[[${item.NAME}]]</option>
+											</select>
+											</td>
+										</tr>
+										<tr>
+											<td style="text-align: right; padding-top: 13px;">备注:</td>
+											<td><input type="text" name="remark" id="remark"
+												th:value="${platform == null ? '' : platform.remark}" style="width: 98%;" /></td>
+										</tr>
+									</table>
+								</div>
+								<div id="zhongxin2" class="center" style="display: none">
+									<br />
+									<br />
+									<br />
+									<br />
+									<br />
+									<img th:src="@{/images/jiazai.gif}" /><br />
+									<h4 class="lighter block green">提交中...</h4>
+								</div>
+							</form>
+						</div>
+						<!-- /.col -->
+					</div>
+					<!-- /.row -->
+				</div>
+				<!-- /.page-content -->
+			</div>
+		</div>
+		<!-- /.main-content -->
+	</div>
+	<!-- /.main-container -->
+
+	<footer>
+		<div style="width: 100%; padding-bottom: 2px;" class="center">
+			<a class="btn btn-mini btn-primary" onclick="save();">保存</a> <a
+				class="btn btn-mini btn-danger" onclick="cancel();">取消</a>
+		</div>
+	</footer>
+
+	<!-- 页面底部js¨ -->
+	<div th:include="/system/index/foot::footdiv" />
+	<!--提示框-->
+	<script type="text/javascript" th:src="@{/js/jquery.tips.js}"></script>
+	<script th:src="@{/ace/js/date-time/bootstrap-datepicker.js}"></script>
+	<script type="text/javascript" th:inline="javascript">
+	var MAX_FILE_NUM = 20;
+	var uploader = new plupload.Uploader({
+        //runtimes : 'html5,flash,silverlight',//设置运行环境，会按设置的顺序，可以选择的值有html5,gears,flash,silverlight,browserplus,html
+        flash_swf_url : /*[[@{/js/plupload/Moxie.swf}]]*/,
+        silverlight_xap_url : /*[[@{/js/plupload/Moxie.xap}]]*/,
+        url : /*[[@{/invest/upload}]]*/,//上传文件路径
+        max_file_size : '3gb',//100b, 10kb, 10mb, 1gb
+        chunk_size : '1mb',//分块大小，小于这个大小的不分块
+        unique_names : true,//生成唯一文件名
+        browse_button : 'uploader', 
+        filters : {
+            max_file_size : '5mb',
+            mime_types: [
+                {title : "Image files", extensions : "jpg,gif,png"}
+            ]
+        },
+        init : {
+            FilesAdded: function(uploader, addFiles) {
+            	var oldLen = uploader.files.length - addFiles.length;
+                // 根据最大文件数量截取
+                uploader.files.splice(MAX_FILE_NUM, uploader.files.length);
+                addFiles = addFiles.slice(0, MAX_FILE_NUM - oldLen);
+                // 对addFiles分别生成base64编码，用于预览
+                $.each(addFiles || [], function(i, file) {
+                    if (!file || !/image\//.test(file.type)) return; //确保文件是图片
+                    if (file.type == 'image/gif') {//gif使用FileReader进行预览,因为mOxie.Image只支持jpg和png
+                        var fr = new mOxie.FileReader();
+                        fr.onload = function () {
+                            file.imgsrc = fr.result;
+                            fr.destroy();
+                            fr = null;
+                        }
+                        fr.readAsDataURL(file.getSource());
+                    } else {
+                        var preloader = new mOxie.Image();
+                        preloader.onload = function () {
+                            preloader.downsize(180, 120);//先压缩一下要预览的图片
+                            var imgsrc = preloader.type == 'image/jpeg' ? preloader.getAsDataURL('image/jpeg', 80) : preloader.getAsDataURL(); //得到图片src,实质为一个base64编码的数据
+                            //file.imgsrc = imgsrc;
+                            var str = '<img width="120px" height="50px" src="' + imgsrc + '" />';
+                            $('#imgList').html(str);
+                            preloader.destroy();
+                            preloader = null;
+                        };
+                        preloader.load(file.getSource());
+                    }
+                });
+                uploader.start();
+                return false;
+            },
+            FileUploaded : function(up, file, info) {//文件上传完毕触发
+                console.log("单独文件上传完毕");
+            	$("#platform_img").val(info.response);
+            },
+            UploadComplete : function( uploader,files ) {
+                console.log("所有文件上传完毕");
+            },
+            UploadProgress : function( uploader,file ) {
+                $("#progress").html("上传进度为：" + file.percent + "%");
+                console.log( file.percent );
+            }
+        }
+    });
+    
+    uploader.init();
+    /*<![CDATA[*/
+    function previewImage(file, callback) {//file为plupload事件监听函数参数中的file对象,callback为预览图片准备完成的回调函数
+        if (!file || !/image\//.test(file.type)) return; //确保文件是图片
+        if (file.type == 'image/gif') {//gif使用FileReader进行预览,因为mOxie.Image只支持jpg和png
+            var fr = new mOxie.FileReader();
+            fr.onload = function () {
+                callback(fr.result);
+                fr.destroy();
+                fr = null;
+            }
+            fr.readAsDataURL(file.getSource());
+        } else {
+            var preloader = new mOxie.Image();
+            preloader.onload = function () {
+                //preloader.downsize(550, 400);//先压缩一下要预览的图片,宽300，高300
+                var imgsrc = preloader.type == 'image/jpeg' ? preloader.getAsDataURL('image/jpeg', 80) : preloader.getAsDataURL(); //得到图片src,实质为一个base64编码的数据
+                callback && callback(imgsrc); //callback传入的参数为预览图片的url
+                preloader.destroy();
+                preloader = null;
+            };
+            preloader.load(file.getSource());
+        }
+    }
+    /*]]>*/
+	</script>
+	<script type="text/javascript" th:inline="javascript">
+		$(top.hangge());
+		var action = [[${action}]];		
+		
+		function riskChange(obj){
+			var riskdes = $('#risk option:selected').text();
+			$('#riskDisplay').val(riskdes.substr(2));
+		}
+		function cancel(){
+			/*<![CDATA[*/
+			top.jzts();
+			if(true && document.forms[0]){
+				var url = /*[[${url}]]*/;
+				document.forms[0].action = url;
+				document.forms[0].submit();
+			}
+			/*]]>*/		
+		}
+		
+		//保存
+		function save() {
+			if ($("#plat_name").val() == "") {
+				$("#plat_name").tips({
+					side : 3,
+					msg : '请输入平台名称',
+					bg : '#AE81FF',
+					time : 2
+				});
+				$("#plat_name").focus();
+				return false;
+			}
+			if ($("#platform_intro").val() == "") {
+				$("#platform_intro").tips({
+					side : 3,
+					msg : '请输入平台介绍',
+					bg : '#AE81FF',
+					time : 2
+				});
+				$("#platform_intro").focus();
+				return false;
+			}
+			if ($("#risk").val() == "") {
+				$("#risk").tips({
+					side : 3,
+					msg : '请输入平台分级',
+					bg : '#AE81FF',
+					time : 2
+				});
+				$("#risk").focus();
+				return false;
+			}
+			if ($("#riskDisplay").val() == "") {
+				$("#riskDisplay").tips({
+					side : 3,
+					msg : '请输入分级名称',
+					bg : '#AE81FF',
+					time : 2
+				});
+				$("#riskDisplay").focus();
+				return false;
+			}
+			if ($("#finance_bg").val() == "") {
+				$("#finance_bg").tips({
+					side : 3,
+					msg : '请输入融资背景',
+					bg : '#AE81FF',
+					time : 2
+				});
+				$("#finance_bg").focus();
+				return false;
+			}
+			if ($("#platform_bg").val() == "") {
+				$("#platform_bg").tips({
+					side : 3,
+					msg : '请输入平台背景',
+					bg : '#AE81FF',
+					time : 2
+				});
+				$("#platform_bg").focus();
+				return false;
+			}
+			if ($("#bank_manage").val() == "") {
+				$("#bank_manage").tips({
+					side : 3,
+					msg : '请输入银行存管',
+					bg : '#AE81FF',
+					time : 2
+				});
+				$("#bank_manage").focus();
+				return false;
+			}
+			if ($("#icp_card").val() == "") {
+				$("#icp_card").tips({
+					side : 3,
+					msg : '请输入ICP证',
+					bg : '#AE81FF',
+					time : 2
+				});
+				$("#icp_card").focus();
+				return false;
+			}
+			if ($("#cash_speed").val() == "") {
+				$("#cash_speed").tips({
+					side : 3,
+					msg : '请输入提现速度',
+					bg : '#AE81FF',
+					time : 2
+				});
+				$("#cash_speed").focus();
+				return false;
+			}
+			if ($("#principal").val() == "") {
+				$("#principal").tips({
+					side : 3,
+					msg : '请输入注册资本',
+					bg : '#AE81FF',
+					time : 2
+				});
+				$("#principal").focus();
+				return false;
+			}
+			if ($("#online").val() == "") {
+				$("#online").tips({
+					side : 3,
+					msg : '请输入上线时间',
+					bg : '#AE81FF',
+					time : 2
+				});
+				$("#online").focus();
+				return false;
+			}
+			if ($("#status").val() == "") {
+				$("#status").tips({
+					side : 3,
+					msg : '请输入平台状态',
+					bg : '#AE81FF',
+					time : 2
+				});
+				$("#status").focus();
+				return false;
+			}
+			$.post(/*[[@{'/invest/platform'+${action}}]]*/,$("#Form").serializeJSON(),function(data){
+				if(data == 'SUCCESS'){
+					cancel();
+				}else{
+					alert(data);
+				}
+			});
+		}
+		$(function(){
+			//日期框
+			$('.date-picker').datepicker({
+				autoclose : true,
+				todayHighlight : true
+			});
+		});
+	</script>
+</body>
+</html>

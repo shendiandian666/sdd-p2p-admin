@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+
+<head>
+<link rel="stylesheet"
+	th:href="@{/assets/css/bootstrap-duallistbox.css}" />
+<dif th:include="/system/index/top::tophead"></dif>
+</head>
+<body class="no-skin">
+	<!-- /section:basics/navbar.layout -->
+	<div class="main-container" id="main-container">
+		<!-- /section:basics/sidebar -->
+		<div class="main-content">
+			<div class="main-content-inner">
+				<div class="page-content">
+					<div class="row">
+						<div class="col-xs-12">
+							<form class="form-horizontal" role="form">
+								<!-- #section:plugins/input.duallist -->
+								<select multiple="multiple" size="10" name="duallistbox_demo1[]"
+									id="duallist">
+									<option th:each="item,status : ${userRoleList}"
+										th:selected="${item.select}" th:value="${item.ROLE_ID}"
+										th:inline="text">[[${item.ROLE_NAME}]]</option>
+								</select>
+								<!-- /section:plugins/input.duallist -->
+							</form>
+						</div>
+						<!-- /.col -->
+					</div>
+				</div>
+				<!-- /.row -->
+			</div>
+			<!-- /.page-content -->
+		</div>
+	</div>
+	<!-- /.main-content -->
+</body>
+<script type="text/javascript" th:src="@{/js/jquery-1.7.2.js}"></script>
+<script type="text/javascript"
+	th:src="@{/assets/js/jquery.bootstrap-duallistbox.js}"></script>
+<script type="text/javascript" th:inline="javascript">
+	$(top.hangge());
+	$(document).ready(
+		function() {
+			var demo1 = $('select[name="duallistbox_demo1[]"]').bootstrapDualListbox({
+				selectedListLabel: '拥有角色',
+				nonSelectedListLabel: '角色列表',
+				preserveSelectionOnMove: 'moved',
+			    moveOnSelect: false,
+			    infoText:false,
+				infoTextFiltered : '<span class="label label-purple label-lg">Filtered</span>'
+			});
+			var container1 = demo1.bootstrapDualListbox('getContainer');
+			container1.find('.btn').addClass('btn-white btn-info btn-bold');
+			$('select[name="duallistbox_demo1[]"]').on('change',function(){
+				var ids = $('select[name="duallistbox_demo1[]"]').val();
+				if(ids!=null){
+					ids = ids.join(",");
+				}else{
+					ids = "";
+				}
+				var url = /*[[@{/userRoleRightsUpdate}]]*/;
+				var postData;
+				postData = {
+					"USER_ID" : [[${USER_ID}]],
+					"ids" : ids
+				};
+				$.post(url, postData, function(data) {});
+			})
+		}
+	);
+	
+</script>
+</html>

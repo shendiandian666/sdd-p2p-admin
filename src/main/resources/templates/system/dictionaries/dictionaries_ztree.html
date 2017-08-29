@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+<meta charset="utf-8" />
+<link type="text/css" rel="stylesheet"
+	th:href="@{/plugins/zTree/3.5/zTreeStyle.css}" />
+<script type="text/javascript" th:src="@{/js/jquery-1.7.2.js}"></script>
+<script type="text/javascript"
+	th:src="@{/plugins/zTree/3.5/jquery.ztree.core-3.5.js}"></script>
+<style type="text/css">
+html,body{
+  height:100%;
+}
+</style>
+</head>
+<body>
+
+	<table style="width: 100%;height: 100%;" border="0">
+		<tr>
+			<div class="nav-search">
+				<input id="keywords" type="text" class="" style="width:90px;"/>
+				<input type="button" onclick="searchTree()" value="查找"/>
+			</div>
+		</tr>
+		<tr>
+			<td style="width: 15%;height: 100%;" valign="top" bgcolor="#F9F9F9">
+				<div style="width: 15%;height: 100%;">
+					<ul id="leftTree" class="ztree"></ul>
+				</div>
+			</td>
+			<td style="width: 85%;" valign="top"><iframe name="treeFrame"
+					id="treeFrame" frameborder="0" th:src="@{/dictionariesRight}"
+					style="margin: 0 auto; width: 100%; height: 100%;"></iframe></td>
+		</tr>
+	</table>
+
+	<script type="text/javascript" th:inline="javascript">
+	$(top.hangge());
+
+	var treeSetting = {
+		async : {
+			enable : true,
+			url : [[@{/dictionariesNodes}]],
+			dataType : "json",
+			autoParam : ["id=parent_id","name=n","level=lv"]
+		},
+		simpleData: {  
+            enable: true,  
+            idKey: "id",  
+            pIdKey: "pId",  
+            rootPId:0,  
+        },
+		view : {
+			dblClickExpand : true,
+			selectedMulti : false,
+			/*<![CDATA[*/
+			expandSpeed : ($.browser.msie && parseInt($.browser.version) <= 6) ? ""
+					: "fast",
+						/*]]>*/
+			fontCss: getFontCss
+		},
+		callback : {
+			onNodeCreated : onAsyncSuccess,
+			onAsyncSuccess: onAsyncSuccess
+		}
+	};
+	
+	$(document).ready(function() {
+		var zn = [[${zTreeNodes}]];
+		var zTreeNodes = eval(zn);
+		var zTreeObj = $.fn.zTree.init($("#leftTree"), treeSetting, zTreeNodes);
+	});
+	
+	function refreshTree(){
+		var treeObj = $.fn.zTree.getZTreeObj("leftTree");
+		var node = treeObj.getSelectedNodes(true);
+		if(node == ''){
+			treeObj.reAsyncChildNodes(node[0], "refresh");
+		}else if(node[0].isParent){
+			treeObj.reAsyncChildNodes(node[0], "refresh");
+		}else{
+			treeObj.reAsyncChildNodes(node[0].getParentNode(), "refresh");
+		}
+	}
+	
+	function onAsyncSuccess(event, treeId, treeNode, msg){
+		var zTreeObj = $.fn.zTree.getZTreeObj("leftTree");
+	    // 这个方法是将标准 JSON 嵌套格式的数据转换为简单 Array 格式
+	    var nodes = zTreeObj.transformToArray(zTreeObj.getNodes()); 
+	    /*<![CDATA[*/
+	    for (var i = 0; i < nodes.length; i++) {
+	    	/*]]>*/
+	        // 判断节点是否已经加载过，如果已经加载过则不需要再加载
+	        if (!nodes[i].zAsync) {
+	            zTreeObj.reAsyncChildNodes(nodes[i], '', true);
+	        }
+	    }
+	}
+	var nodeList = [];
+	function searchTree(){
+		var zTreeObj = $.fn.zTree.getZTreeObj("leftTree");
+		//1.先把全部节点更新为普通样式
+        var treeNodes = zTreeObj.transformToArray(zTreeObj.getNodes());
+        /*<![CDATA[*/
+		for(var i = 0; i < treeNodes.length; i++) {
+			/*]]>*/
+			treeNodes[i].highlight = false;
+			zTreeObj.updateNode(treeNodes[i]);
+        }
+        //2.收起树
+        //zTreeObj.expandAll(false);
+        //3.把指定节点的样式更新为高亮显示，并展开
+	    treeAsyncReady('treeId', function() {
+	    	var _keywords = $("#keywords").val();
+	    	if(_keywords != ''){
+	    		// 在这里写搜索节点的代码
+		    	nodeList = zTreeObj.getNodesByParamFuzzy("name",_keywords,null);
+		        updateNodes(true);
+	    	}
+	    });
+	}
+	
+	function close_ztree(treeId) {
+        var treeObj = $.fn.zTree.getZTreeObj(treeId);
+        var nodes = treeObj.transformToArray(treeObj.getNodes());
+        var nodeLength = nodes.length;
+        /*<![CDATA[*/
+        for(var i = 0; i < nodeLength; i++) {
+        	/*]]>*/
+            treeObj.expandNode(nodes[i], false, true, false);
+        }
+    }
+	
+	//高亮显示被搜索到的节点  
+	function updateNodes(highlight) {  
+	    var zTree = $.fn.zTree.getZTreeObj("leftTree");  
+	    /*<![CDATA[*/
+	    for( var i=0, l=nodeList.length; i<l; i++) {  
+	    	/*]]>*/
+	    	nodeList[i].highlight = highlight; //高亮显示搜索到的节点(highlight是自己设置的一个属性)  
+	    	zTree.expandNode(nodeList[i].getParentNode(), true, false, false); //将搜索到的节点的父节点展开  
+	        zTree.updateNode(nodeList[i]); //更新节点数据，主要用于该节点显示属性的更新  
+	    }
+	}
+	
+	function getFontCss(treeId, treeNode){
+		return (!!treeNode.highlight) ? {color:"#A60000", "font-weight":"bold"} : {color:"#333", "font-weight":"normal"};
+	}
+	
+	function treeAsyncReady(treeId, f) {
+	    // 如果树已经加载完，马上执行函数
+	    if (treeAsyncReady.done) {
+	        return f();
+	    }
+	    
+	    var zTreeObj = $.fn.zTree.getZTreeObj("leftTree");
+	    
+	    treeAsyncReady.timer = setInterval(function() {
+	        if (treeAsyncReady.done) {
+	            return false;
+	        }
+	        // 获取没有异步加载过的节点
+	        var nodes = zTreeObj.getNodesByFilter(function(node) {
+	            return !node.zAsync;
+	        });
+	        // 如果节点数为零则说明已经加载完
+	        if (nodes.length == 0) {
+	            clearInterval(treeAsyncReady.timer);
+	            treeAsyncReady.timer == null;
+	            
+	            // 执行函数
+	            f();
+	            
+	            treeAsyncReady.done = true;
+	        }
+	    }, 13);
+	}
+</script>
+</body>
+</html>
+

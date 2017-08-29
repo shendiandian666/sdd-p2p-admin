@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sdd.mapper.invest.PostOrderMapper">
+
+	<!--表名 -->
+	<sql id="tableName">
+		p2p_post_order
+	</sql>
+	
+	<!-- 字段 -->
+	<sql id="Field">
+		account,
+		activity_name,
+		investor_name,
+		investor_phone,
+		deposit,
+		invest_date,
+		post_date,
+		days,
+		rebate,
+		cash_back,
+		username,
+		status,
+		remark,
+		ID
+	</sql>
+	
+	<!-- 字段值 -->
+	<sql id="FieldValue">
+		#{account},
+		#{activity_name},
+		#{investor_name},
+		#{investor_phone},
+		#{deposit},
+		#{invest_date},
+		#{post_date},
+		#{days},
+		#{rebate},
+		#{cash_back},
+		#{username},
+		#{status},
+		#{remark}
+	</sql>
+	
+	<select id="list" parameterType="java.util.Map" resultType="java.util.Map">
+		select a.*,
+				(select name
+	          from jt_dictionaries
+	         where parent_id in
+	               (select dic_id
+	                  from jt_column_dic dic
+	                 where dic.table_name = 'p2p_post_order'
+	                   and dic.table_column = 'status')
+	           and bianma = a.status) status_des
+		from 
+			<include refid="tableName"></include> a
+			where 1=1 
+			<if test="keywords != null and keywords != ''">
+			and a.account = #{keywords}
+		    </if>
+		    <if test="platform_id != null and platform_id != ''">
+		     and a.platform_id = #{platform_id}
+		    </if>
+	</select>
+	
+	<select id="isExists" parameterType="java.util.Map" resultType="java.lang.Integer">
+		select count(1) from 
+		<include refid="tableName"></include> 
+		where ID = #{ID}
+	</select>
+	
+	<select id="listById" parameterType="java.util.Map" resultType="java.util.Map">
+		select *
+		  from 
+		<include refid="tableName"></include>
+		where ID = #{ID}
+	</select>
+	
+	<insert id="save" parameterType="java.util.Map">
+		insert into 
+		<include refid="tableName"></include>
+		(
+		<include refid="Field"></include>
+		) values (
+		<include refid="FieldValue"></include>
+		)
+	</insert>
+	
+	<update id="update" parameterType="java.util.Map">
+		update 
+		<include refid="tableName"></include>
+		set 
+		account = #{account},
+		activity_name = #{activity_name},
+		investor_name = #{investor_name},
+		investor_phone = #{investor_phone},
+		deposit = #{deposit},
+		invest_date = #{invest_date},
+		days = #{days},
+		rebate = #{rebate},
+		cash_back = #{cash_back},
+		username = #{username},
+		status = #{status},
+		remark = #{remark},
+		ID = ID
+		where ID = #{ID}
+	</update>
+	
+	<update id="updateStatus" parameterType="java.util.Map">
+	update p2p_post_order
+	   set status = #{status}
+	   <if test="remark != null and remark != ''">
+	   ,remark = #{remark}
+	   </if>
+	 where id = #{ID}
+	</update>
+	
+	<insert id="updateBalanceList" parameterType="java.util.Map">
+		insert into p2p_balance_list
+		(account,type,balance,rebate,rebate_late,remark,oper_user)
+		select account,#{type},balance,rebate,rebate_late,#{remark},#{user.userName} 
+		from p2p_account
+		where account = #{account}
+	</insert>
+	
+	<insert id="insertWarn" parameterType="java.util.Map">
+		insert into p2p_warn_info
+		(account,remark)
+		values(#{account},#{remark})
+	</insert>
+	
+	<delete id="delete" parameterType="java.util.Map">
+		delete from 
+		<include refid="tableName"></include>
+		where ID = #{ID}
+	</delete>
+	
+	<select id="reportData" resultType="java.util.Map">
+	select ifnull(sum(deposit),0) totalDeposit,ifnull(sum(cash_back),0) totalCashBack,
+	ifnull(sum(interest),0) totalInterest
+		  from p2p_post_order
+		 where status = '1'
+	</select>
+    
+</mapper>

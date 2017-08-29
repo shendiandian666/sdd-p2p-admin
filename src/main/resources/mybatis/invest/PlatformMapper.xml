@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sdd.mapper.invest.PlatformMapper">
+
+	<!--表名 -->
+	<sql id="tableName">
+		p2p_platform
+	</sql>
+	
+	<!-- 字段 -->
+	<sql id="Field">
+		name,
+		plat_name,
+		platform_intro,
+		platform_img,
+		platform_tags,
+		risk,
+		riskDisplay,
+		finance_bg,
+		platform_bg,
+		bank_manage,
+		icp_card,
+		cash_speed,
+		principal,
+		online,
+		status,
+		url,
+		remark
+	</sql>
+	
+	<!-- 字段值 -->
+	<sql id="FieldValue">
+		#{name},
+		#{plat_name},
+		#{platform_intro},
+		#{platform_img},
+		#{platform_tags},
+		#{risk},
+		#{riskDisplay},
+		#{finance_bg},
+		#{platform_bg},
+		#{bank_manage},
+		#{icp_card},
+		#{cash_speed},
+		#{principal},
+		#{online},
+		#{status},
+		#{url},
+		#{remark}	
+	</sql>
+	
+	<select id="list" parameterType="java.util.Map" resultType="java.util.Map">
+		select  name,
+				plat_name,
+				platform_intro,
+				platform_img,
+				platform_tags,
+				risk,
+				riskDisplay,
+				finance_bg,
+				platform_bg,
+				bank_manage,
+				icp_card,
+				cash_speed,
+				principal,
+				online,
+				(select name
+	          from jt_dictionaries
+	         where parent_id in
+	               (select dic_id
+	                  from jt_column_dic dic
+	                 where dic.table_name = 'p2p_platform'
+	                   and dic.table_column = 'status')
+	           and bianma = status) status_des,
+				status,
+				url,
+				remark,
+		ID
+		from 
+			<include refid="tableName"></include>
+			where 1=1 
+			<if test="keywords != null and keywords != ''">
+				and name LIKE CONCAT(CONCAT('%', #{keywords}),'%')
+			</if>
+			order by risk
+	</select>
+	
+	<select id="listDic" resultType="java.util.Map">
+		select id,name from 
+		<include refid="tableName"></include>
+	</select>
+	
+	<select id="isExists" parameterType="java.util.Map" resultType="java.lang.Integer">
+		select count(1) from 
+		<include refid="tableName"></include> 
+		where ID = #{ID}
+	</select>
+	
+	<select id="listById" parameterType="java.util.Map" resultType="java.util.Map">
+		select  name,
+				plat_name,
+				platform_intro,
+				platform_img,
+				platform_tags,
+				risk,
+				riskDisplay,
+				finance_bg,
+				platform_bg,
+				bank_manage,
+				icp_card,
+				cash_speed,
+				principal,
+				online,
+				status,
+				url,
+				remark,
+		ID
+		from 
+		<include refid="tableName"></include>
+		where ID = #{ID}
+	</select>
+	
+	<insert id="save" parameterType="java.util.Map">
+		insert into 
+		<include refid="tableName"></include>
+		(
+		<include refid="Field"></include>
+		) values (
+		<include refid="FieldValue"></include>
+		)
+	</insert>
+	
+	<update id="update" parameterType="java.util.Map">
+		update 
+		<include refid="tableName"></include>
+		set 
+		name = #{name},
+		plat_name = #{plat_name},
+		platform_intro = #{platform_intro},
+		platform_img = #{platform_img},
+		platform_tags = #{platform_tags},
+		risk = #{risk},
+		riskDisplay = #{riskDisplay},
+		finance_bg = #{finance_bg},
+		platform_bg = #{platform_bg},
+		bank_manage = #{bank_manage},
+		icp_card = #{icp_card},
+		cash_speed = #{cash_speed},
+		principal = #{principal},
+		online = #{online},
+		status = #{status},
+		url = #{url},
+		remark = #{remark}
+		where ID = #{ID}
+	</update>
+	
+	<delete id="delete" parameterType="java.util.Map">
+		delete from 
+		<include refid="tableName"></include>
+		where ID = #{ID}
+	</delete>
+    
+</mapper>
