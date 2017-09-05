@@ -76,6 +76,7 @@ public class ActivityService {
 	 * @return
 	 * @throws Exception
 	 */
+	@SuppressWarnings("unchecked")
 	public String bestService(PageData pd) throws Exception {
 		//查询最佳方案
 		Map<String, Object> best = (Map<String, Object>) dao.findForObject("com.sdd.mapper.invest.ActivityMapper.bestPlan", pd);

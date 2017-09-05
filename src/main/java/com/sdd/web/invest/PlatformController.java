@@ -7,23 +7,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.UUID;
-
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-
-import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.FileUploadException;
-import org.apache.commons.fileupload.disk.DiskFileItemFactory;
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -31,9 +18,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.MultipartHttpServletRequest;
-
-import com.fasterxml.jackson.databind.util.JSONPObject;
 import com.github.pagehelper.PageInfo;
 import com.sdd.model.Page;
 import com.sdd.model.PageData;
@@ -41,8 +25,6 @@ import com.sdd.service.invest.PlatformService;
 import com.sdd.service.system.DictionariesService;
 import com.sdd.util.Tools;
 import com.sdd.web.WebController;
-
-import net.sf.json.JSONObject;
 
 /**
  * 说明： 创建人：kbky 创建时间：
@@ -73,13 +55,18 @@ public class PlatformController extends WebController {
 		return "/invest/platform/platform_list";
 	}
 
+	@Value("${p2p.domain}")
+	private String domain;
 	/*
 	 * 保存
 	 */
 	@RequestMapping("/platformSave")
 	@ResponseBody
 	public String save(Map<String, Object> map) throws Exception {
-		return investPlatformService.saveService(getPageData());
+		PageData pd = getPageData();
+		String img = pd.getString("platform_img");
+		pd.put("platform_img", domain + img);
+		return investPlatformService.saveService(pd);
 	}
 
 	/*
@@ -88,7 +75,10 @@ public class PlatformController extends WebController {
 	@RequestMapping("/platformUpdate")
 	@ResponseBody
 	public String update(Map<String, Object> map) throws Exception {
-		return investPlatformService.updateService(getPageData());
+		PageData pd = getPageData();
+		String img = pd.getString("platform_img");
+		pd.put("platform_img", domain + img);
+		return investPlatformService.updateService(pd);
 	}
 
 	/*

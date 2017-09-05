@@ -249,16 +249,6 @@
 				$("#cash_back").focus();
 				return false;
 			}
-			if ($("#username").val() == "") {
-				$("#username").tips({
-					side : 3,
-					msg : '请输入投资平台用户名',
-					bg : '#AE81FF',
-					time : 2
-				});
-				$("#username").focus();
-				return false;
-			}
 			if ($("#status").val() == "") {
 				$("#status").tips({
 					side : 3,
@@ -267,16 +257,6 @@
 					time : 2
 				});
 				$("#status").focus();
-				return false;
-			}
-			if ($("#remark").val() == "") {
-				$("#remark").tips({
-					side : 3,
-					msg : '请输入原因',
-					bg : '#AE81FF',
-					time : 2
-				});
-				$("#remark").focus();
 				return false;
 			}
 			$.post(/*[[@{'/invest/postorder'+${action}}]]*/,$("#Form").serializeJSON(),function(data){

@@ -62,7 +62,7 @@ public class ActivityPlanService {
 		
 		//计算最少总收益(返现+奖励+利息+红包+[体验金利息+其它])
 		float totalIncome = depositDisplay_s*rebate/100 + depositDisplay_s*rebatePlus/100 + depositDisplay_s*rate/100/365*days + redback + bbin_interest + others;
-		totalIncome = (float)(Math.ceil(totalIncome*100))/100;
+		totalIncome = (float)(Math.ceil(totalIncome));
 		//综合年化利率
 		float yearRate = (float)(Math.ceil(totalIncome/days*365/depositDisplay_s*100*100))/100;
 		pd.put("totalIncome", totalIncome);
@@ -75,7 +75,7 @@ public class ActivityPlanService {
 		String totalIncome_txt = "";
 		if(depositDisplay_e == 0){
 			deposit_e = "无上限";
-			totalIncome_txt = totalIncome + "+";
+			totalIncome_txt = totalIncome + "↑";
 		}else if(depositDisplay_e == 1){
 			deposit_e = "";
 			totalIncome_txt = totalIncome + "";
@@ -143,7 +143,7 @@ public class ActivityPlanService {
 		
 		//计算最少总收益(返现+奖励+利息+红包+[体验金利息+其它])
 		float totalIncome = depositDisplay_s*rebate/100 + depositDisplay_s*rebatePlus/100 + depositDisplay_s*rate/100/365*days + redback + bbin_interest + others;
-		totalIncome = (float)(Math.ceil(totalIncome*100))/100;
+		totalIncome = (float)(Math.ceil(totalIncome));
 		//综合年化利率
 		float yearRate = (float)(Math.ceil(totalIncome/days*365/depositDisplay_s*100*100))/100;
 		pd.put("totalIncome", totalIncome);
@@ -156,14 +156,14 @@ public class ActivityPlanService {
 		String totalIncome_txt = "";
 		if(depositDisplay_e == 0){
 			deposit_e = "无上限";
-			totalIncome_txt = totalIncome + "+";
+			totalIncome_txt = totalIncome + "↑";
 		}else if(depositDisplay_e == 1){
 			deposit_e = "";
 			totalIncome_txt = totalIncome + "";
 		}else{
 			deposit_e = NumberFormat.getNumberInstance(Locale.CHINA).format(depositDisplay_e);
 			float totalIncome_e = depositDisplay_e*rebate/100 + depositDisplay_e*rebatePlus/100 + depositDisplay_e*rate/100/365*days + redback + bbin_interest + others;
-			totalIncome_e = (float)(Math.ceil(totalIncome_e*100))/100;
+			totalIncome_e = (float)(Math.ceil(totalIncome*100))/100;
 			totalIncome_txt = totalIncome + " - " + totalIncome_e;
 		}
 		pd.put("totalIncome_txt", totalIncome_txt);//总收益范围
@@ -174,7 +174,6 @@ public class ActivityPlanService {
 			String depositDisplay_txt = deposit_s + " - " + deposit_e;
 			pd.put("depositDisplay_txt", depositDisplay_txt);
 		}
-		
 		
 		//综合年化最高的设置为最佳方案
 		int planCount = hightPlanService(pd);

@@ -87,7 +87,7 @@ public class PostOrderService {
 		//更新余额详细记录
 		Map<String, Object> recordParams = new HashMap<String, Object>();
 		recordParams.put("type", "2");
-		recordParams.put("remark", "交单<审核通过>");
+		recordParams.put("remark", "交单<审核通过:" + cashBack + ">");
 		recordParams.put("account", account);
 		recordParams.put("user", pd.get("user"));
 		dao.update("com.sdd.mapper.invest.PostOrderMapper.updateBalanceList", recordParams);
@@ -138,7 +138,7 @@ public class PostOrderService {
 		//更新余额详细记录
 		Map<String, Object> recordParams = new HashMap<String, Object>();
 		recordParams.put("type", "2");
-		recordParams.put("remark", "交单<"+pd.get("remark")+">");
+		recordParams.put("remark", "交单<"+pd.get("remark")+":"+cashBack+">");
 		recordParams.put("account", account);
 		recordParams.put("user", pd.get("user"));
 		dao.update("com.sdd.mapper.invest.PostOrderMapper.updateBalanceList", recordParams);
@@ -174,6 +174,7 @@ public class PostOrderService {
 		return Constants.SUCCESS;
 	}
 	
+	@SuppressWarnings("unchecked")
 	public Map<String, Object> reportData() throws Exception {
 		return (Map<String, Object>) dao.findForObject("com.sdd.mapper.invest.PostOrderMapper.reportData", "");
 	}
