@@ -123,7 +123,7 @@
 	<select id="hightPlan" parameterType="java.util.Map" resultType="java.lang.Integer">
 		select count(1) from p2p_activity_plan
 		where activity_id=#{activity_id,jdbcType=INTEGER} 
-		and interest > #{interest,jdbcType=DOUBLE}
+		and year_rate > #{year_rate,jdbcType=DOUBLE}
 	</select>
 	
 	<insert id="save" parameterType="java.util.Map">

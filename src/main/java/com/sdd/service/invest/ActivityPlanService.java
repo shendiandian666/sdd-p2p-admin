@@ -7,6 +7,8 @@ import java.util.Map;
 import javax.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.github.pagehelper.PageHelper;
 import com.sdd.dao.DaoSupport;
 import com.sdd.model.PageData;
@@ -45,6 +47,7 @@ public class ActivityPlanService {
 	 * 收益=本金*年利率/365*天数
 	       年利率=收益/天数*365/本金*100%=20000/14*365/350000*100%=148.98%
 	 */
+	@Transactional
 	public String saveService(PageData pd) throws Exception {
 		String activityId = pd.getString("activity_id");
 		float depositDisplay_s = Float.valueOf(pd.getString("depositDisplay_s"));//充值金额最少
@@ -75,15 +78,15 @@ public class ActivityPlanService {
 		String totalIncome_txt = "";
 		if(depositDisplay_e == 0){
 			deposit_e = "无上限";
-			totalIncome_txt = totalIncome + "↑";
+			totalIncome_txt = String.format("%.2f",totalIncome) + "↑";
 		}else if(depositDisplay_e == 1){
 			deposit_e = "";
-			totalIncome_txt = totalIncome + "";
+			totalIncome_txt = String.format("%.2f",totalIncome) + "";
 		}else{
 			deposit_e = NumberFormat.getNumberInstance(Locale.CHINA).format(depositDisplay_e);
 			float totalIncome_e = depositDisplay_e*rebate/100 + depositDisplay_e*rebatePlus/100 + depositDisplay_e*rate/100/365*days + redback + bbin_interest + others;
-			totalIncome_e = (float)(Math.ceil(totalIncome*100))/100;
-			totalIncome_txt = totalIncome + " - " + totalIncome_e;
+			totalIncome_e = (float)(Math.ceil(totalIncome_e*100))/100;
+			totalIncome_txt = String.format("%.2f",totalIncome) + " - " + String.format("%.2f",totalIncome_e);
 		}
 		pd.put("totalIncome_txt", totalIncome_txt);//总收益范围
 		if("".equals(deposit_e)){
@@ -94,23 +97,23 @@ public class ActivityPlanService {
 			pd.put("depositDisplay_txt", depositDisplay_txt);
 		}
 		
-		//综合年化最高的设置为最佳方案
-		int planCount = hightPlanService(pd);
-		if(planCount < 1){
-			PageData bestPd = new PageData();
-			bestPd.put("bestName", pd.getString("name"));
-			bestPd.put("bestDeposit", depositDisplay_s);
-			bestPd.put("bestMoney", totalIncome);
-			bestPd.put("bestInterest", yearRate);
-			bestPd.put("ID", activityId);
-			activityService.updateService(bestPd);
-		}
 		//保存方案
 		int count = (int) dao.findForObject("com.sdd.mapper.invest.ActivityPlanMapper.isExists", pd);
 		if(count > 0){
 			return "主键ID已存在!";
 		}else{
 			dao.save("com.sdd.mapper.invest.ActivityPlanMapper.save", pd);
+			//综合年化最高的设置为最佳方案
+			int planCount = hightPlanService(pd);
+			if(planCount < 1){
+				PageData bestPd = new PageData();
+				bestPd.put("bestName", pd.getString("name"));
+				bestPd.put("bestDeposit", depositDisplay_s);
+				bestPd.put("bestMoney", totalIncome);
+				bestPd.put("bestInterest", yearRate);
+				bestPd.put("ID", activityId);
+				activityService.updateService(bestPd);
+			}
 			return Constants.SUCCESS;
 		}
 	}
@@ -126,6 +129,7 @@ public class ActivityPlanService {
 	/*
 	 * 修改
 	 */
+	@Transactional
 	public String updateService(PageData pd) throws Exception {
 		String activityId = pd.getString("activity_id");
 		float depositDisplay_s = Float.valueOf(pd.getString("depositDisplay_s"));//充值金额最少
@@ -156,15 +160,15 @@ public class ActivityPlanService {
 		String totalIncome_txt = "";
 		if(depositDisplay_e == 0){
 			deposit_e = "无上限";
-			totalIncome_txt = totalIncome + "↑";
+			totalIncome_txt = String.format("%.2f",totalIncome) + "↑";
 		}else if(depositDisplay_e == 1){
 			deposit_e = "";
-			totalIncome_txt = totalIncome + "";
+			totalIncome_txt = String.format("%.2f",totalIncome) + "";
 		}else{
 			deposit_e = NumberFormat.getNumberInstance(Locale.CHINA).format(depositDisplay_e);
 			float totalIncome_e = depositDisplay_e*rebate/100 + depositDisplay_e*rebatePlus/100 + depositDisplay_e*rate/100/365*days + redback + bbin_interest + others;
-			totalIncome_e = (float)(Math.ceil(totalIncome*100))/100;
-			totalIncome_txt = totalIncome + " - " + totalIncome_e;
+			totalIncome_e = (float)(Math.ceil(totalIncome_e*100))/100;
+			totalIncome_txt = String.format("%.2f",totalIncome) + " - " + String.format("%.2f",totalIncome_e);
 		}
 		pd.put("totalIncome_txt", totalIncome_txt);//总收益范围
 		if("".equals(deposit_e)){
@@ -175,21 +179,20 @@ public class ActivityPlanService {
 			pd.put("depositDisplay_txt", depositDisplay_txt);
 		}
 		
-		//综合年化最高的设置为最佳方案
-		int planCount = hightPlanService(pd);
-		if(planCount < 1){
-			PageData bestPd = new PageData();
-			bestPd.put("bestName", pd.getString("name"));
-			bestPd.put("bestDeposit", depositDisplay_s);
-			bestPd.put("bestMoney", totalIncome);
-			bestPd.put("bestInterest", yearRate);
-			bestPd.put("ID", activityId);
-			activityService.updateService(bestPd);
-		}
-		
 		int count = (int) dao.findForObject("com.sdd.mapper.invest.ActivityPlanMapper.isExists", pd);
 		if(count > 0){
 			dao.update("com.sdd.mapper.invest.ActivityPlanMapper.update", pd);
+			//综合年化最高的设置为最佳方案
+			int planCount = hightPlanService(pd);
+			if(planCount < 1){
+				PageData bestPd = new PageData();
+				bestPd.put("bestName", pd.getString("name"));
+				bestPd.put("bestDeposit", depositDisplay_s);
+				bestPd.put("bestMoney", totalIncome);
+				bestPd.put("bestInterest", yearRate);
+				bestPd.put("ID", activityId);
+				activityService.updateService(bestPd);
+			}
 			return Constants.SUCCESS;
 		}else{
 			return "记录已被其他用户删除!";		
