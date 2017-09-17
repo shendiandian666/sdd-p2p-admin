@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.github.pagehelper.PageHelper;
 import com.sdd.dao.DaoSupport;
 import com.sdd.model.PageData;
+import com.sdd.model.system.Permission;
 import com.sdd.model.system.User;
 import com.sdd.util.Constants;
 import com.sdd.util.Tools;
@@ -107,15 +108,19 @@ public class PermissionService {
 		if("".equals(parentId)){
 			pd.put("PARENT_ID", "0");
 		}
-		String _parameter = "SEQ_DICTIONARIES_ID";
-		String sequence = (String) dao.findForObject("com.sdd.mapper.CommonMapper.sequence", _parameter);
-		pd.put("MENU_ID", sequence);
-		int count = dao.save("com.sdd.mapper.PermissionMapper.save", pd);
+		Permission permission = new Permission();
+		permission.setMENU_NAME(Tools.getStringValue(pd.get("MENU_NAME")));
+		permission.setMENU_URL(Tools.getStringValue(pd.get("MENU_URL")));
+		permission.setPARENT_ID(Tools.getStringValue(pd.get("PARENT_ID")));
+		permission.setMENU_ORDER(Tools.getStringValue(pd.get("MENU_ORDER")));
+		permission.setMENU_ICON(Tools.getStringValue(pd.get("MENU_ICON")));
+		permission.setMENU_TYPE(Tools.getStringValue(pd.get("MENU_TYPE")));
+		int count = dao.save("com.sdd.mapper.PermissionMapper.save", permission);
 		if(count > 0){
 			Object object = dao.findForObject("com.sdd.mapper.UserMapper.loginUser", pd);
 			Map<String, Object> userMap = Tools.objToMap(object);
 			String userRights = Tools.getStringValue(userMap.get("RIGHTS"));
-			BigInteger resRights = new BigInteger(userRights).setBit(Integer.valueOf(sequence));
+			BigInteger resRights = new BigInteger(userRights).setBit(Integer.valueOf(permission.getMENU_ID()));
 			pd.put("RIGHTS", resRights.toString());
 			User user = (User) SecurityUtils.getSubject().getPrincipal();
 			pd.put("USER_ID", user.getUserId());
@@ -141,7 +146,7 @@ public class PermissionService {
 	public String permissionDel(PageData pd) throws Exception {
 		int count = dao.save("com.sdd.mapper.PermissionMapper.delete", pd);
 		if(count > 0){
-			Object object = dao.findForObject("com.sdd.mapper.UserMapper.loginUser", pd);
+			/*Object object = dao.findForObject("com.sdd.mapper.UserMapper.loginUser", pd);
 			Map<String, Object> userMap = Tools.objToMap(object);
 			String userRights = Tools.getStringValue(userMap.get("RIGHTS"));
 			Object objList = dao.findForList("com.sdd.mapper.PermissionMapper.findDel", pd);
@@ -153,7 +158,7 @@ public class PermissionService {
 				pd.put("RIGHTS", resRights.toString());
 				pd.put("USER_ID", user.getUserId());
 				dao.update("com.sdd.mapper.UserMapper.updateRights", pd);
-			}
+			}*/
 			return Constants.SUCCESS;
 		}else{
 			return "删除失败";

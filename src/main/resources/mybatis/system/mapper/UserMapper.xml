@@ -42,8 +42,6 @@
 	
 	<!-- 字段 -->
 	<sql id="Field">
-		USER_ID,	
-		ORGAN_ID,
 		USER_NAME,	
 		PASSWORD,
 		REAL_NAME,
@@ -54,8 +52,6 @@
 	
 	<!-- 字段值 -->
 	<sql id="FieldValue">
-		TO_CHAR(sysdate, 'yyyyMMddHH24miss')||SEQ_USER_ID.NEXTVAL,	
-		#{ORGAN_ID,jdbcType=VARCHAR},
 		#{USER_NAME,jdbcType=VARCHAR},	
 		#{PASSWORD,jdbcType=VARCHAR},
 		#{REAL_NAME,jdbcType=VARCHAR},
@@ -73,8 +69,7 @@
 	                  from jt_column_dic dic
 	                 where dic.table_name = 'JT_USER'
 	                   and dic.table_column = 'STATUS')
-	           and bianma = a.status) STATUS_DESC,
-	       b.organ_id || b.organ_name ORGAN_NAME
+	           and bianma = a.status) STATUS_DESC
 	  from jt_user a
 	 <if test="keywords!= null and keywords != ''">
 			and
@@ -113,11 +108,8 @@
 		update 
 		<include refid="tableName"></include>
 		set 
-		ORGAN_ID = #{ORGAN_ID,jdbcType=VARCHAR},
 		USER_NAME = #{USER_NAME,jdbcType=VARCHAR},
 		REAL_NAME = #{REAL_NAME,jdbcType=VARCHAR},
-		RIGHTS = #{RIGHTS,jdbcType=VARCHAR},
-		ROLE_RIGHTS = #{ROLE_RIGHTS,jdbcType=VARCHAR},
 		STATUS = #{STATUS,jdbcType=VARCHAR}
 		where USER_ID = #{USER_ID,jdbcType=VARCHAR}
 	</update>

@@ -141,8 +141,6 @@ public class UserController extends WebController {
 	@RequestMapping("/userAdd")
 	public String add(Map<String, Object> map) throws Exception{
 		PageData pd = getPageData();
-		map.put("organDicList", organService.organDic(pd));
-		
 		pd.put("TABLE_NAME", "JT_USER");
 		pd.put("TABLE_COLUMN", "STATUS");
 		map.put("statusList", dictionariesService.listDicService(pd));
@@ -155,7 +153,6 @@ public class UserController extends WebController {
 	@RequestMapping("/userEdit")
 	public String edit(Map<String, Object> map) throws Exception{
 		PageData pd = getPageData();
-		map.put("organDicList", organService.organDic(pd));
 		Map<String, Object> result = userService.editService(pd);
 		pd.put("TABLE_NAME", "JT_USER");
 		pd.put("TABLE_COLUMN", "STATUS");

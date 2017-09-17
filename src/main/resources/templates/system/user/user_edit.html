@@ -53,18 +53,6 @@
 												style="width: 98%;" /></td>
 										</tr>
 										<tr>
-											<td style="text-align: right; padding-top: 13px;">所属机构:</td>
-											<td id="organId">
-												<select
-												class="chosen-select form-control" name="ORGAN_ID"
-												id="ORGAN_ID" data-placeholder="父机构编码"
-												style="vertical-align: top;">
-													<option value=""></option>
-													<option th:each="item,status : ${organDicList}" th:value="${item.ORGAN_ID}" th:selected="${item.ORGAN_ID == (user == null ? '' : user.ORGAN_ID)}" th:inline="text">[[${item.ORGAN_ID}]][[${item.ORGAN_NAME}]]</option>
-												</select>
-											</td>
-										</tr>
-										<tr>
 											<td style="text-align: right; padding-top: 13px;">状态:</td>
 											<td id="tableName">
 												<select

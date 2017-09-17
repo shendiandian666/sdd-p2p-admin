@@ -11,7 +11,6 @@
 	
 	<!-- 字段 -->
 	<sql id="Field">
-		MENU_ID,	
 		MENU_NAME,	
 		MENU_URL,	
 		PARENT_ID,	
@@ -22,7 +21,6 @@
 	
 	<!-- 字段值 -->
 	<sql id="FieldValue">
-		#{MENU_ID},	
 		#{MENU_NAME,jdbcType=VARCHAR},	
 		#{MENU_URL,jdbcType=VARCHAR},	
 		#{PARENT_ID},	
@@ -79,13 +77,23 @@
 		select * from jt_menu where MENU_ID = #{menuId}
 	</select>
 	
-	<insert id="save" parameterType="java.util.Map">
+	<insert id="save" parameterType="com.sdd.model.system.Permission" useGeneratedKeys="true" keyProperty="MENU_ID">
 		insert into 
 		<include refid="tableName"></include>
 		(
-		<include refid="Field"></include>
+		MENU_NAME,	
+		MENU_URL,	
+		PARENT_ID,	
+		MENU_ORDER,	
+		MENU_ICON,	
+		MENU_TYPE
 		) values (
-		<include refid="FieldValue"></include>
+		#{MENU_NAME,jdbcType=VARCHAR},	
+		#{MENU_URL,jdbcType=VARCHAR},	
+		#{PARENT_ID},	
+		#{MENU_ORDER},	
+		#{MENU_ICON,jdbcType=VARCHAR},	
+		#{MENU_TYPE,jdbcType=VARCHAR}
 		)
 	</insert>
 	
@@ -103,11 +111,7 @@
 	<delete id="delete" parameterType="java.util.Map">
 		delete from 
 		<include refid="tableName"></include>
-		where menu_id in (
-		  select t.menu_id
-		    from jt_menu t
-		   start with t.menu_id = #{TREE_ID}
-		  connect by prior t.menu_id = t.parent_id)
+		where menu_id = #{TREE_ID}
 	</delete>
 	
 	<select id="findDel" parameterType="java.util.Map" resultType="java.util.Map">

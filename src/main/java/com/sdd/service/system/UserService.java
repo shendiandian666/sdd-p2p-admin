@@ -9,6 +9,7 @@ import javax.annotation.Resource;
 import org.apache.commons.collections.MapUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import com.github.pagehelper.PageHelper;
 import com.sdd.dao.DaoSupport;
@@ -36,7 +37,12 @@ public class UserService {
 		return Tools.objToList(object);
 	}
 	
+	@Value("${default.user.password}")
+	private String password;
+	
 	public String saveService(PageData pd) throws Exception {
+		//密码
+		pd.put("PASSWORD", MD5.md5(password));
 		dao.save("com.sdd.mapper.UserMapper.save", pd);
 		return Constants.SUCCESS;
 	}

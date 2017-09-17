@@ -126,6 +126,9 @@ public class DictionariesService {
 	 * 删除
 	 */
 	public int delService(PageData pd) throws Exception {
+		Map<String, Object> map = (Map<String, Object>) dao.findForObject("com.sdd.mapper.DictionariesMapper.findById", pd);
+		
+		
 		return (int) dao.delete("com.sdd.mapper.DictionariesMapper.delete", pd);
 	}
 	

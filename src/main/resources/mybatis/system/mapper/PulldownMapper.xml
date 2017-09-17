@@ -58,8 +58,7 @@
 		update 
 		<include refid="tableName"></include>
 		set TABLE_NAME = #{TABLE_NAME,jdbcType=VARCHAR},
-		TABLE_COLUMN = #{TABLE_COLUMN,jdbcType=VARCHAR},
-		DIC_ID = #{DIC_ID,jdbcType=INTEGER}
+		TABLE_COLUMN = #{TABLE_COLUMN,jdbcType=VARCHAR}
 		where ID = #{ID,jdbcType=INTEGER}
 	</update>
 	

@@ -77,7 +77,9 @@ public class PlatformController extends WebController {
 	public String update(Map<String, Object> map) throws Exception {
 		PageData pd = getPageData();
 		String img = pd.getString("platform_img");
-		pd.put("platform_img", domain + img);
+		if(!img.contains("http")){
+			pd.put("platform_img", domain + img);
+		}
 		return investPlatformService.updateService(pd);
 	}
 

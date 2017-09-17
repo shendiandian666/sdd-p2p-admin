@@ -52,7 +52,6 @@
 											<th class="center" style="width: 50px;">序号</th>
 											<th class="center">用户名</th>
 											<th class="center">真实姓名</th>
-											<th class="center">所属机构</th>
 											<th class="center">状态</th>
 											<th class="center">操作</th>
 										</tr>
@@ -60,13 +59,11 @@
 
 									<tbody>
 
-
 										<!-- 开始循环 -->
 										<tr th:each="item,status : ${userList}" th:inline="text">
 											<td class='center' style="width: 30px;">[[${status.index+1}]]</td>
 											<td class='center' th:text="${item.USER_NAME}"></td>
 											<td class='center' th:text="${item.REAL_NAME}"></td>
-											<td class='center' th:text="${item.ORGAN_NAME}"></td>
 											<td class='center' th:text="${item.STATUS_DESC}"></td>
 											<td class="center">
 													<div class="inline pos-rel">

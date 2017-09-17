@@ -107,11 +107,7 @@
 	<delete id="delete" parameterType="java.util.Map">
 		delete from 
 		<include refid="tableName"></include>
-		where dictionaries_id in (
-		  select t.dictionaries_id
-		    from jt_dictionaries t
-		   start with t.dictionaries_id = #{TREE_ID}
-		  connect by prior t.dictionaries_id = t.parent_id)
+		where dictionaries_id = #{TREE_ID}
 	</delete>
     
 </mapper>
