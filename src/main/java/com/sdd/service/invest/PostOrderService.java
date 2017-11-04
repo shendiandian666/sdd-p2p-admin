@@ -87,7 +87,8 @@ public class PostOrderService {
 		//更新余额详细记录
 		Map<String, Object> recordParams = new HashMap<String, Object>();
 		recordParams.put("type", "2");
-		recordParams.put("remark", "交单<审核通过:" + cashBack + ">");
+		String platformName = Tools.getStringValue(order.get("platform_name"));
+		recordParams.put("remark", platformName + "<审核通过:" + String.format("%.2f", cashBack) + "元>");
 		recordParams.put("account", account);
 		recordParams.put("user", pd.get("user"));
 		dao.update("com.sdd.mapper.invest.PostOrderMapper.updateBalanceList", recordParams);
@@ -138,7 +139,8 @@ public class PostOrderService {
 		//更新余额详细记录
 		Map<String, Object> recordParams = new HashMap<String, Object>();
 		recordParams.put("type", "2");
-		recordParams.put("remark", "交单<"+pd.get("remark")+":"+cashBack+">");
+		String platformName = Tools.getStringValue(order.get("platform_name"));
+		recordParams.put("remark", platformName + "<"+pd.get("remark")+":"+String.format("%.2f", cashBack)+"元>");
 		recordParams.put("account", account);
 		recordParams.put("user", pd.get("user"));
 		dao.update("com.sdd.mapper.invest.PostOrderMapper.updateBalanceList", recordParams);

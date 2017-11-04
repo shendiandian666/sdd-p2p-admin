@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sdd.mapper.invest.LoanMapper">
+
+	<!--表名 -->
+	<sql id="tableName">
+		p2p_loan_list
+	</sql>
+	
+	<!-- 字段 -->
+	<sql id="Field">
+		name,
+		loan_range,
+		loan_limit,
+		loan_condition,
+		loan_conditions,
+		loan_tag,
+		review_instr,
+		product_desc,
+		logo,
+		url,
+		remark
+	</sql>
+	
+	<sql id="FieldValue">
+		#{name},
+		#{loan_range},
+		#{loan_limit},
+		#{loan_condition},
+		#{loan_conditions},
+		#{loan_tag},
+		#{review_instr},
+		#{product_desc},
+		#{platform_img},
+		#{url},
+		#{remark}
+	</sql>
+	
+	<select id="list" parameterType="java.util.Map" resultType="java.util.Map">
+		select a.*,
+			   (select name
+	          from jt_dictionaries
+	         where parent_id in
+	               (select dic_id
+	                  from jt_column_dic dic
+	                 where dic.table_name = 'p2p_platform'
+	                   and dic.table_column = 'status')
+	           and bianma = a.status) status_des
+		from 
+			<include refid="tableName"></include> a
+			where 1=1 
+			<if test="keywords != null and keywords != ''">
+				and name LIKE CONCAT(CONCAT('%', #{keywords}),'%')
+			</if>
+			order by id
+	</select>
+	
+	<select id="isExists" parameterType="java.util.Map" resultType="java.lang.Integer">
+		select count(1) from 
+		<include refid="tableName"></include> 
+		where id = #{id}
+	</select>
+	
+	<select id="listById" parameterType="java.util.Map" resultType="java.util.Map">
+		select a.*,
+			   (select name
+	          from jt_dictionaries
+	         where parent_id in
+	               (select dic_id
+	                  from jt_column_dic dic
+	                 where dic.table_name = 'p2p_platform'
+	                   and dic.table_column = 'status')
+	           and bianma = a.status) status_des
+		from 
+		<include refid="tableName"></include> a
+		where id = #{id}
+	</select>
+	
+	<insert id="save" parameterType="java.util.Map">
+		insert into 
+		<include refid="tableName"></include>
+		(
+		<include refid="Field"></include>
+		) values (
+		<include refid="FieldValue"></include>
+		)
+	</insert>
+	
+	<update id="update" parameterType="java.util.Map">
+		update 
+		<include refid="tableName"></include>
+		set 
+		name = #{name},
+		loan_range = #{loan_range},
+		loan_limit = #{loan_limit},
+		loan_condition = #{loan_condition},
+		loan_conditions = #{loan_conditions},
+		loan_tag = #{loan_tag},
+		review_instr = #{review_instr},
+		product_desc = #{product_desc},
+		logo = #{platform_img},
+		url = #{url},
+		status = #{status},
+		remark = #{remark}
+		where id = #{id}
+	</update>
+	
+	<delete id="delete" parameterType="java.util.Map">
+		delete from 
+		<include refid="tableName"></include>
+		where id = #{id}
+	</delete>
+    
+</mapper>
